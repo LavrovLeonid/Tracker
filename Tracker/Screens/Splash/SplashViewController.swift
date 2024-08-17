@@ -8,18 +8,39 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-          return .lightContent
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        presentMainTabBar()
+    }
+    
+    private func presentMainTabBar() {
         guard let window = UIApplication.shared.windows.first else {
             assertionFailure("Invalid window configuration")
             return
         }
         
-        window.rootViewController = MainTabBarController()
+        let trackersViewController = TrackersViewController()
+        trackersViewController.tabBarItem = UITabBarItem(
+            title: "Трекеры",
+            image: .trackersIcon,
+            tag: 0
+        )
+        
+        let statisticsViewController = StatisticsViewController()
+        statisticsViewController.tabBarItem = UITabBarItem(
+            title: "Статистика",
+            image: .statisticsIcon,
+            tag: 1
+        )
+        
+        let mainTabBar = TabBarController()
+        
+        mainTabBar.viewControllers = [
+            NavigationController(rootViewController: trackersViewController), 
+            NavigationController(rootViewController: statisticsViewController)
+        ]
+        
+        window.rootViewController = mainTabBar
     }
 }
