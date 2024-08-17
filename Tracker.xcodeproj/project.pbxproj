@@ -44,6 +44,7 @@
 		F45E83662C53650600588A3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45E83652C53650600588A3F /* AppDelegate.swift */; };
 		F45E83682C53650600588A3F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45E83672C53650600588A3F /* SceneDelegate.swift */; };
 		F45E836F2C53650700588A3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F45E836E2C53650700588A3F /* Assets.xcassets */; };
+		F49138912C705FCF00BDC783 /* PresentingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49138902C705FCF00BDC783 /* PresentingViewController.swift */; };
 		F4FB8A982C6143CD00A47C39 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FB8A972C6143CD00A47C39 /* TextField.swift */; };
 		F4FB8A9E2C614C8700A47C39 /* TextFieldCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FB8A9D2C614C8700A47C39 /* TextFieldCollectionViewCell.swift */; };
 		F4FEBF792C54A418002765BE /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FEBF782C54A418002765BE /* SplashViewController.swift */; };
@@ -101,6 +102,7 @@
 		F45E83672C53650600588A3F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		F45E836E2C53650700588A3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F45E83732C53650700588A3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F49138902C705FCF00BDC783 /* PresentingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentingViewController.swift; sourceTree = "<group>"; };
 		F4FB8A972C6143CD00A47C39 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		F4FB8A9D2C614C8700A47C39 /* TextFieldCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCollectionViewCell.swift; sourceTree = "<group>"; };
 		F4FEBF782C54A418002765BE /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
@@ -356,6 +358,14 @@
 			path = Tracker;
 			sourceTree = "<group>";
 		};
+		F491388F2C705F3800BDC783 /* UIViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F49138902C705FCF00BDC783 /* PresentingViewController.swift */,
+			);
+			path = UIViewController;
+			sourceTree = "<group>";
+		};
 		F4FB8A962C6143A600A47C39 /* TextField */ = {
 			isa = PBXGroup;
 			children = (
@@ -521,6 +531,7 @@
 			children = (
 				F4516CA52C5F8B8C00CAB0A3 /* Int */,
 				F45712EE2C67138D0057F76E /* ReusableView */,
+				F491388F2C705F3800BDC783 /* UIViewController */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -642,6 +653,7 @@
 				F4FEBF922C554071002765BE /* TrackerRecord.swift in Sources */,
 				F4FEBF792C54A418002765BE /* SplashViewController.swift in Sources */,
 				F4FEBF822C54AE7E002765BE /* TrackersViewController.swift in Sources */,
+				F49138912C705FCF00BDC783 /* PresentingViewController.swift in Sources */,
 				F4FEBF8F2C553F13002765BE /* WeekDay.swift in Sources */,
 				F4FEBF9C2C560219002765BE /* TrackerCollectionViewCell.swift in Sources */,
 				F4516CB22C5F9B6900CAB0A3 /* CreateTrackerViewControllerDelegate.swift in Sources */,

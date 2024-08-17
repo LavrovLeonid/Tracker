@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class StatisticsViewController: UIViewController {
+final class StatisticsViewController: UIViewController, PresentingViewController {
     private lazy var emptyView: EmptyView = {
         let emptyView = EmptyView()
         
@@ -20,24 +20,27 @@ final class StatisticsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupNavigationItem()
         setupView()
+        setupSubviews()
+        setupConstraints()
     }
     
-    private func setupView() {
+    func setupView() {
+        navigationItem.title = "Статистика"
+        navigationItem.largeTitleDisplayMode = .always
+        
         view.backgroundColor = .trackerWhite
-        
+    }
+    
+    func setupSubviews() {
         view.addSubview(emptyView)
-        
+    }
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             emptyView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
-    }
-    
-    private func setupNavigationItem() {
-        navigationItem.largeTitleDisplayMode = .always
-        navigationItem.title = "Статистика"
     }
 }

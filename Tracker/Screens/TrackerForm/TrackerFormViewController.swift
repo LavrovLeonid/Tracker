@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerFormViewController: UIViewController, TrackerFormViewControllerProtocol {
+final class TrackerFormViewController: UIViewController, PresentingViewController, TrackerFormViewControllerProtocol {
     private var trackerType: TrackerType = .habit
     private weak var delegate: TrackerFormViewControllerDelegate?
     
@@ -105,6 +105,8 @@ final class TrackerFormViewController: UIViewController, TrackerFormViewControll
         super.viewDidLoad()
         
         setupView()
+        setupSubviews()
+        setupConstraints()
     }
     
     func configure(trackerType: TrackerType, delegate: TrackerFormViewControllerDelegate?) {
@@ -112,22 +114,26 @@ final class TrackerFormViewController: UIViewController, TrackerFormViewControll
         self.delegate = delegate
     }
     
-    private func setupView() {
+    func setupView() {
         title = trackerType.title
         navigationItem.hidesBackButton = true
         isModalInPresentation = true
         
         view.backgroundColor = .trackerWhite
         
+        formCollectionView.dataSource = self
+        formCollectionView.delegate = self
+    }
+    
+    func setupSubviews() {
         actionsStackView.addArrangedSubview(cancelButton)
         actionsStackView.addArrangedSubview(submitButton)
         
         view.addSubview(formCollectionView)
         view.addSubview(actionsStackView)
-        
-        formCollectionView.dataSource = self
-        formCollectionView.delegate = self
-        
+    }
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             formCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             formCollectionView.bottomAnchor.constraint(equalTo: actionsStackView.topAnchor, constant: -16),

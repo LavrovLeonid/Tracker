@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController, PresentingViewController {
     private var categories: [TrackerCategory] = []
     private var completedTrackers = Set<TrackerRecord>()
     private var currentDate = Date()
@@ -72,21 +72,46 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupNavigationItem()
         setupView()
+        setupSubviews()
+        setupConstraints()
         
         fetchCategories()
     }
     
-    private func setupView() {
+    func setupView() {
+        navigationItem.title = "Трекеры"
+        
+        let leftBarButtonItem = UIBarButtonItem(
+            image: .plusIcon,
+            style: .plain,
+            target: self,
+            action: #selector(addTrackerCategoryTapped)
+        )
+        leftBarButtonItem.tintColor = .trackerBlack
+        
+        navigationItem.leftBarButtonItem = leftBarButtonItem
+        
+        let searchController = UISearchController()
+        searchController.searchBar.placeholder = "Поиск"
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
+        
+        navigationItem.searchController = searchController
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+        
         view.backgroundColor = .trackerWhite
         
         trackersCollectionView.dataSource = self
         trackersCollectionView.delegate = self
-        
+    }
+    
+    func setupSubviews() {
         view.addSubview(emptyView)
         view.addSubview(trackersCollectionView)
-        
+    }
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             emptyView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -111,28 +136,6 @@ final class TrackersViewController: UIViewController {
         emptyView.isHidden = true
         
         trackersCollectionView.reloadData()
-    }
-    
-    private func setupNavigationItem() {
-        navigationItem.title = "Трекеры"
-        
-        let leftBarButtonItem = UIBarButtonItem(
-            image: .plusIcon,
-            style: .plain,
-            target: self,
-            action: #selector(addTrackerCategoryTapped)
-        )
-        leftBarButtonItem.tintColor = .trackerBlack
-        
-        navigationItem.leftBarButtonItem = leftBarButtonItem
-        
-        let searchController = UISearchController()
-        searchController.searchBar.placeholder = "Поиск"
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
-        
-        navigationItem.searchController = searchController
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
     }
     
     private func getTrackerCategory(at index: Int) -> TrackerCategory {

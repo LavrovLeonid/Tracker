@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ScheduleViewController: UIViewController, ScheduleViewControllerProtocol {
+final class ScheduleViewController: UIViewController, PresentingViewController, ScheduleViewControllerProtocol {
     private weak var delegate: ScheduleViewControllerDelegate?
     private let weekDays = WeekDay.allCases
     private var selectedWeekDays = Set<WeekDay>()
@@ -41,6 +41,8 @@ final class ScheduleViewController: UIViewController, ScheduleViewControllerProt
         super.viewDidLoad()
         
         setupView()
+        setupSubviews()
+        setupConstraints()
     }
     
     func configure(initialSelectedWeekDays: Set<WeekDay>, delegate: ScheduleViewControllerDelegate?) {
@@ -49,18 +51,22 @@ final class ScheduleViewController: UIViewController, ScheduleViewControllerProt
         selectedWeekDays = Set(initialSelectedWeekDays)
     }
     
-    private func setupView() {
+    func setupView() {
         title = "Расписание"
         navigationItem.hidesBackButton = true
         
         view.backgroundColor = .trackerWhite
         
-        view.addSubview(schedulesCollectionView)
-        view.addSubview(submitButton)
-        
         schedulesCollectionView.dataSource = self
         schedulesCollectionView.delegate = self
-        
+    }
+    
+    func setupSubviews() {
+        view.addSubview(schedulesCollectionView)
+        view.addSubview(submitButton)
+    }
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             schedulesCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             schedulesCollectionView.bottomAnchor.constraint(equalTo: submitButton.topAnchor, constant: -16),
