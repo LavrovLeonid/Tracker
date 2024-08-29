@@ -58,7 +58,7 @@ final class TrackerCardView: UIView {
     }
     
     func configure(with tracker: Tracker) {
-        backgroundColor = tracker.color.uiColor
+        backgroundColor = tracker.color
         nameLabel.text = tracker.name
         emojiLabel.text = tracker.emoji
     }

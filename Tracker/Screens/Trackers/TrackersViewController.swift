@@ -8,16 +8,9 @@
 import UIKit
 
 final class TrackersViewController: UIViewController, PresentingViewController {
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers = Set<TrackerRecord>()
-    private var currentDate = Date()
-    
-    private let calendar = Calendar.current
-    private var currentWeekday: WeekDay {
-        WeekDay(rawValue: calendar.dateComponents([.weekday], from: currentDate).weekday ?? 1) ?? .monday
-    }
-    
-    private var filteredCategories: [TrackerCategory] = []
+    private lazy var trackersDataStore: DataStoreProtocol = {
+        DataStore(delegate: self)
+    }()
     
     private let trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -56,7 +49,7 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
         datePicker.tintColor = .trackerBlue
-        datePicker.locale = calendar.locale
+        datePicker.locale = Calendar.current.locale
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         
         return datePicker
@@ -76,7 +69,7 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         setupSubviews()
         setupConstraints()
         
-        fetchCategories()
+        displayCategories()
     }
     
     func setupView() {
@@ -138,79 +131,16 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         trackersCollectionView.reloadData()
     }
     
-    private func getTrackerCategory(at index: Int) -> TrackerCategory {
-        filteredCategories[index]
-    }
-    
-    private func getTracker(at indexPath: IndexPath) -> Tracker {
-        getTrackerCategory(at: indexPath.section).trackers[indexPath.item]
-    }
-    
-    private func getTrackerRecord(at indexPath: IndexPath) -> TrackerRecord {
-        let tracker = getTracker(at: indexPath)
-        
-        return TrackerRecord(trackerId: tracker.id, date: currentDate)
-    }
-    
-    private func fetchCategories() {
-        let categories: [TrackerCategory] = self.categories.reduce([]) { partialResult, category in
-            let filteredTrackers = category.trackers.filter { tracker in
-                tracker.type == .event || tracker.schedules.contains(currentWeekday)
-            }
-            
-            if !filteredTrackers.isEmpty {
-                return partialResult + [
-                    TrackerCategory(
-                        name: category.name,
-                        trackers: filteredTrackers
-                    )
-                ]
-            }
-            
-            return partialResult
-        }
-        
-        if categories.isEmpty {
+    private func displayCategories() {
+        if trackersDataStore.isEmptyTrackerCateogries {
             presentEmptyView()
         } else {
-            self.filteredCategories = categories
-            
             presentTrackersCollectionView()
-            
-            trackersCollectionView.reloadData()
         }
     }
     
     private func addTracker(_ tracker: Tracker, at category: TrackerCategory) {
-        if categories.contains(category) {
-            categories = categories.reduce([], { partialResult, trackerCategory in
-                if trackerCategory == category {
-                    let newTrackerCategory = TrackerCategory(
-                        name: trackerCategory.name,
-                        trackers: trackerCategory.trackers + [tracker]
-                    )
-                    
-                    return partialResult + [newTrackerCategory]
-                }
-                
-                return partialResult + [trackerCategory]
-            })
-        } else {
-            let newTrackerCategory = TrackerCategory(
-                name: category.name,
-                trackers: [tracker]
-            )
-            
-            categories = categories + [newTrackerCategory]
-        }
-        
-        fetchCategories()
-    }
-    
-    private func setCurrentDate(_ date: Date) {
-        currentDate = date
-        
-        fetchCategories()
+        trackersDataStore.addTrackerToCategory(category, tracker: tracker)
     }
     
     @IBAction private func addTrackerCategoryTapped() {
@@ -218,21 +148,29 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         
         createTrackerViewController.configure(with: self)
         
-        present(UINavigationController(rootViewController: createTrackerViewController), animated: true)
+        present(
+            UINavigationController(rootViewController: createTrackerViewController), 
+            animated: true
+        )
     }
     
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
-        setCurrentDate(sender.date)
+        trackersDataStore.setCurrentDate(sender.date)
+        
+        displayCategories()
     }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        filteredCategories.count
+        trackersDataStore.numberOfSections
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        filteredCategories[section].trackers.count
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
+        trackersDataStore.numberOfItemsInSection(section)
     }
     
     func collectionView(
@@ -247,7 +185,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? DefaultHeaderReusableView {
-            cell.configure(with: getTrackerCategory(at: indexPath.section).name)
+            cell.configure(with: trackersDataStore.category(at: indexPath.section).name)
         }
         
         return cell
@@ -260,13 +198,12 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? TrackerCollectionViewCell {
-            let tracker = getTracker(at: indexPath)
-            let trackerRecord = getTrackerRecord(at: indexPath)
+            let tracker = trackersDataStore.tracker(at: indexPath)
             
             cell.setupCell(
                 with: tracker,
-                quantity: completedTrackers.filter { $0.trackerId == tracker.id }.count,
-                isSelected: completedTrackers.contains(trackerRecord),
+                quantity: trackersDataStore.countTrackerRecords(for: tracker),
+                isSelected: trackersDataStore.isSelectedTracker(at: tracker),
                 delegate: self
             )
         }
@@ -281,7 +218,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        guard indexPaths.count > 0 else { return nil }
+        guard let indexPath = indexPaths.first else { return nil }
         
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
@@ -291,8 +228,8 @@ extension TrackersViewController: UICollectionViewDelegate {
                 UIAction(title: "Редактировать") { _ in
                     
                 },
-                UIAction(title: "Удалить", attributes: [.destructive]) { _ in
-                    
+                UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
+                    self?.trackersDataStore.removeTracker(at: indexPath)
                 }
             ])
         })
@@ -303,9 +240,8 @@ extension TrackersViewController: UICollectionViewDelegate {
         contextMenuConfiguration configuration: UIContextMenuConfiguration,
         highlightPreviewForItemAt indexPath: IndexPath
     ) -> UITargetedPreview? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell else {
-            return nil
-        }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell 
+        else { return nil }
         
         return cell.targetedPreview
     }
@@ -360,14 +296,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCellComplete(cell: TrackerCollectionViewCell) {
         guard let indexPath = trackersCollectionView.indexPath(for: cell) else { return }
         
-        let trackerRecord = getTrackerRecord(at: indexPath)
-        let second = calendar.dateComponents([.second], from: Date(), to: trackerRecord.date).second ?? 0
-        
-        guard calendar.isDateInToday(trackerRecord.date) || second < 0 else { return }
-        
-        completedTrackers = completedTrackers.symmetricDifference([trackerRecord])
-        
-        trackersCollectionView.reloadItems(at: [indexPath])
+        trackersDataStore.completeTracker(at: indexPath)
     }
 }
 
@@ -378,7 +307,17 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         tracker: Tracker
     ) {
         viewController.dismiss(animated: true) { [weak self] in
-            self?.addTracker(tracker, at: trackerCategory)
+            guard let self else { return }
+            
+            addTracker(tracker, at: trackerCategory)
         }
+    }
+}
+
+extension TrackersViewController: DataStoreDelegate {
+    func didUpdate() {
+        displayCategories()
+        
+        trackersCollectionView.reloadData()
     }
 }

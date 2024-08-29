@@ -41,7 +41,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell, ReusableView {
         
         trackerCardView.configure(with: tracker)
         trackerQuantityManagmentView.configure(
-            quantity: quantity, buttonBackground: tracker.color.uiColor, isSelected: isSelected, delegate: self
+            quantity: quantity, buttonBackground: tracker.color, isSelected: isSelected, delegate: self
         )
     }
     
