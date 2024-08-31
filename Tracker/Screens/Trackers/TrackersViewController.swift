@@ -115,7 +115,7 @@ final class TrackersViewController: UIViewController, PresentingViewController {
             trackersCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             trackersCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
-            datePicker.widthAnchor.constraint(equalToConstant: 100)
+            datePicker.widthAnchor.constraint(equalToConstant: 77)
         ])
     }
     

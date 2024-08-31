@@ -26,6 +26,6 @@ final class PrimaryButton: BaseButton {
     private func setupButton() {
         backgroundColor = .trackerBlack
         setTitleColor(.trackerWhite, for: .normal)
-        setTitleColor(.trackerBlack, for: .disabled)
+        setTitleColor(.trackerWhite, for: .disabled)
     }
 }
