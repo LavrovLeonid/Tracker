@@ -46,7 +46,7 @@
 		F472363F2C79C31700457B34 /* UIColor+init.swift in Sources */ = {isa = PBXBuildFile; fileRef = F472363E2C79C31700457B34 /* UIColor+init.swift */; };
 		F49138912C705FCF00BDC783 /* PresentingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49138902C705FCF00BDC783 /* PresentingViewController.swift */; };
 		F4918F1A2C8033D9009F12B9 /* DataStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4918F192C8033D9009F12B9 /* DataStoreProtocol.swift */; };
-		F4B19A2F2C75D7310082D703 /* TrackerModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F4B19A2D2C75D7310082D703 /* TrackerModel.xcdatamodeld */; };
+		F4918F282C82DFE7009F12B9 /* TrackerModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F4918F262C82DFE7009F12B9 /* TrackerModel.xcdatamodeld */; };
 		F4D3DC002C7B1D3900250E05 /* DataStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D3DBFF2C7B1D3900250E05 /* DataStoreError.swift */; };
 		F4D3DC022C7B301400250E05 /* DataStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D3DC012C7B301400250E05 /* DataStoreDelegate.swift */; };
 		F4EABE332C7A5BD500CC30B7 /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EABE322C7A5BD500CC30B7 /* DataStore.swift */; };
@@ -110,7 +110,7 @@
 		F472363E2C79C31700457B34 /* UIColor+init.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+init.swift"; sourceTree = "<group>"; };
 		F49138902C705FCF00BDC783 /* PresentingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentingViewController.swift; sourceTree = "<group>"; };
 		F4918F192C8033D9009F12B9 /* DataStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreProtocol.swift; sourceTree = "<group>"; };
-		F4B19A2E2C75D7310082D703 /* TrackerModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrackerModel.xcdatamodel; sourceTree = "<group>"; };
+		F4918F272C82DFE7009F12B9 /* TrackerModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrackerModel.xcdatamodel; sourceTree = "<group>"; };
 		F4D3DBFF2C7B1D3900250E05 /* DataStoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreError.swift; sourceTree = "<group>"; };
 		F4D3DC012C7B301400250E05 /* DataStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreDelegate.swift; sourceTree = "<group>"; };
 		F4EABE322C7A5BD500CC30B7 /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
@@ -403,7 +403,7 @@
 		F4B19A2C2C75D70B0082D703 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				F4B19A2D2C75D7310082D703 /* TrackerModel.xcdatamodeld */,
+				F4918F262C82DFE7009F12B9 /* TrackerModel.xcdatamodeld */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -689,7 +689,6 @@
 				F4516CBD2C6092BB00CAB0A3 /* TrackerFormViewController.swift in Sources */,
 				F45712EA2C6632910057F76E /* TrackerFormViewControllerListItems.swift in Sources */,
 				F45E83662C53650600588A3F /* AppDelegate.swift in Sources */,
-				F4B19A2F2C75D7310082D703 /* TrackerModel.xcdatamodeld in Sources */,
 				F45E83682C53650600588A3F /* SceneDelegate.swift in Sources */,
 				F453186C2C64846200A2722F /* EmojiCollectionViewCell.swift in Sources */,
 				F4FEBF992C55423E002765BE /* EmptyView.swift in Sources */,
@@ -720,6 +719,7 @@
 				F45712FA2C6734BB0057F76E /* TrackerFormViewControllerDelegate.swift in Sources */,
 				F4FEBF892C553D74002765BE /* TrackerCategory.swift in Sources */,
 				F45712F02C6713A50057F76E /* ReusableView.swift in Sources */,
+				F4918F282C82DFE7009F12B9 /* TrackerModel.xcdatamodeld in Sources */,
 				F45713012C674DB20057F76E /* ScheduleViewControllerDelegate.swift in Sources */,
 				F4516CB72C608FD000CAB0A3 /* PrimaryButton.swift in Sources */,
 				F45712F32C6717C60057F76E /* OutlineButton.swift in Sources */,
@@ -940,12 +940,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		F4B19A2D2C75D7310082D703 /* TrackerModel.xcdatamodeld */ = {
+		F4918F262C82DFE7009F12B9 /* TrackerModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				F4B19A2E2C75D7310082D703 /* TrackerModel.xcdatamodel */,
+				F4918F272C82DFE7009F12B9 /* TrackerModel.xcdatamodel */,
 			);
-			currentVersion = F4B19A2E2C75D7310082D703 /* TrackerModel.xcdatamodel */;
+			currentVersion = F4918F272C82DFE7009F12B9 /* TrackerModel.xcdatamodel */;
 			name = TrackerModel.xcdatamodeld;
 			path = "/Users/leonidlavrov/Documents/ios-projects/Tracker/Tracker/CoreData/TrackerModel.xcdatamodeld";
 			sourceTree = "<group>";
