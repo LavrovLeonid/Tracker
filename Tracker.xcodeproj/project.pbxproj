@@ -946,8 +946,7 @@
 				F4918F272C82DFE7009F12B9 /* TrackerModel.xcdatamodel */,
 			);
 			currentVersion = F4918F272C82DFE7009F12B9 /* TrackerModel.xcdatamodel */;
-			name = TrackerModel.xcdatamodeld;
-			path = "/Users/leonidlavrov/Documents/ios-projects/Tracker/Tracker/CoreData/TrackerModel.xcdatamodeld";
+			path = TrackerModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
