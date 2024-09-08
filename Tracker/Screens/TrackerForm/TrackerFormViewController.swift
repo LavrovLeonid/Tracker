@@ -26,13 +26,32 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     private var selectedCategoryName = "Важное"
     private var selectedWeekDays = Set<WeekDay>()
     private var selectedEmoji: String?
-    private var selectedColor: TrackerColor?
+    private var selectedColor: UIColor?
     private let emoji = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱", 
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
         "🥦", "🏓", "🥇", "🎸", "🏝", "😪"
     ]
-    private let colors = TrackerColor.allCases
+    private let colors = [
+        UIColor.trackerColorSelection1,
+        UIColor.trackerColorSelection2,
+        UIColor.trackerColorSelection3,
+        UIColor.trackerColorSelection4,
+        UIColor.trackerColorSelection5,
+        UIColor.trackerColorSelection6,
+        UIColor.trackerColorSelection7,
+        UIColor.trackerColorSelection8,
+        UIColor.trackerColorSelection9,
+        UIColor.trackerColorSelection10,
+        UIColor.trackerColorSelection11,
+        UIColor.trackerColorSelection12,
+        UIColor.trackerColorSelection13,
+        UIColor.trackerColorSelection14,
+        UIColor.trackerColorSelection15,
+        UIColor.trackerColorSelection16,
+        UIColor.trackerColorSelection17,
+        UIColor.trackerColorSelection18
+    ]
     
     private let formCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -323,7 +342,7 @@ extension TrackerFormViewController: UICollectionViewDataSource {
                 if let cell = cell as? ColorCollectionViewCell {
                     let color = colors[indexPath.item]
                     
-                    cell.configure(color: color.uiColor, isSelected: selectedColor == color)
+                    cell.configure(color: color, isSelected: selectedColor == color)
                 }
                 
                 return cell

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TrackerType {
+enum TrackerType: Int {
     case habit
     case event
     

@@ -5,13 +5,13 @@
 //  Created by Леонид Лавров on 7/27/24.
 //
 
-import Foundation
+import UIKit
 
 struct Tracker: Identifiable {
     let id: TrackerId
     let type: TrackerType
     let name: String
-    let color: TrackerColor
+    let color: UIColor
     let emoji: String
     let schedules: Set<WeekDay>
 }

@@ -157,7 +157,7 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
             arrowImageView.heightAnchor.constraint(equalToConstant: 24),
             arrowImageView.widthAnchor.constraint(equalToConstant: 24),
             
-            dividerView.heightAnchor.constraint(equalToConstant: 1),
+            dividerView.heightAnchor.constraint(equalToConstant: 0.5),
             dividerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             dividerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             dividerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
