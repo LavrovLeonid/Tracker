@@ -8,6 +8,8 @@
 import Foundation
 
 enum ListItemCollectionCellEndAdorment {
+    case none
     case arrow
+    case check
     case toggle(Bool)
 }

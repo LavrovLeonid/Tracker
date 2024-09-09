@@ -8,20 +8,25 @@
 import Foundation
 
 final class TrackersViewModel: TrackersViewModelProtocol {
+    // MARK: Model
     private var trackersDataStore: DataStoreProtocol
     
+    // MARK: Bindings
     var onTrackersStateChange: Binding<Bool>?
     
+    // MARK: Properties
     var numberOfSections: Int {
         trackersDataStore.numberOfSections
     }
     
+    // MARK: Initialization
     init(dataStore: DataStoreProtocol) {
         trackersDataStore = dataStore
         
         trackersDataStore.setDelegate(self)
     }
     
+    // MARK: Methods
     func viewDidLoad() {
         onTrackersStateChange?(trackersDataStore.isEmptyTrackerCateogries)
     }
@@ -30,7 +35,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         trackersDataStore.numberOfItemsInSection(section)
     }
     
-    @IBAction func setCurrentDate(_ date: Date) {
+    func setCurrentDate(_ date: Date) {
         trackersDataStore.setCurrentDate(date)
     }
     
@@ -64,6 +69,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
 }
 
+// MARK: DataStoreDelegate
 extension TrackersViewModel: DataStoreDelegate {
     func didUpdate() {
         onTrackersStateChange?(trackersDataStore.isEmptyTrackerCateogries)

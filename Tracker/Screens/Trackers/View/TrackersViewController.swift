@@ -130,9 +130,15 @@ final class TrackersViewController:
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            emptyView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            emptyView.centerYAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.centerYAnchor
+            ),
+            emptyView.leadingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16
+            ),
+            emptyView.trailingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16
+            ),
             
             trackersCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -312,7 +318,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
             let indexPath = trackersCollectionView.indexPath(for: cell)
         else { return }
         
-        view.completeTracker(at: indexPath)
+        viewModel.completeTracker(at: indexPath)
     }
 }
 

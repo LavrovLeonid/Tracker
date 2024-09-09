@@ -23,7 +23,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         trackerType == .habit ? list.count : list.count - 1
     }
     private var trackerName = ""
-    private var selectedCategoryName = "Важное"
+    private var selectedCategory: TrackerCategory?
     private var selectedWeekDays = Set<WeekDay>()
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
@@ -87,7 +87,6 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
-        collectionView.allowsMultipleSelection = true
         
         return collectionView
     }()
@@ -166,6 +165,23 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         ])
     }
     
+    private func presentCategoriesViewController() {
+        let categoriesViewController = CategoriesViewController()
+        
+        let viewModel = CategoriesViewModel(
+            dataStore: DataStore(),
+            categoriesModel: CategoriesModel()
+        )
+        
+        categoriesViewController.initialize(viewModel: viewModel)
+        categoriesViewController.configure(delegate: self)
+        
+        present(
+            UINavigationController(rootViewController: categoriesViewController), 
+            animated: true
+        )
+    }
+    
     private func presentScheduleViewController() {
         let scheduleViewController = ScheduleViewController()
         
@@ -179,7 +195,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     
     private func isValidForm() -> Bool {
         guard !trackerName.isEmpty, trackerName.count <= maxTrackerNameLength else { return false }
-        guard !selectedCategoryName.isEmpty else { return false }
+        guard selectedCategory != nil else { return false }
         guard trackerType != .habit || !selectedWeekDays.isEmpty else { return false }
         guard selectedEmoji != nil else { return false }
         guard selectedColor != nil else { return false }
@@ -196,14 +212,11 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     }
     
     @IBAction private func submitButtonTapped() {
-        guard let selectedColor, let selectedEmoji else { return }
+        guard let selectedColor, let selectedEmoji, let selectedCategory else { return }
         
         delegate?.trackerFormSubmit(
             self,
-            trackerCategory: .init(
-                name: selectedCategoryName,
-                trackers: []
-            ),
+            trackerCategory: selectedCategory,
             tracker: .init(
                 id: UUID(),
                 type: trackerType,
@@ -309,7 +322,7 @@ extension TrackerFormViewController: UICollectionViewDataSource {
                         case .categories:
                             cell.configure(
                                 title: list[indexPath.item].title,
-                                description: selectedCategoryName
+                                description: selectedCategory?.name
                             )
                         case .schedule:
                             cell.configure(
@@ -373,11 +386,11 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
             case .name:
                 UIEdgeInsets(top: 24, left: 16, bottom: 12, right: 16)
             case .list:
-                UIEdgeInsets(top: 12,left: 18,bottom: 32,right: 18)
+                UIEdgeInsets(top: 12, left: 18, bottom: 32, right: 18)
             case .emoji:
-                UIEdgeInsets(top: 16,left: 18,bottom: 40,right: 18)
+                UIEdgeInsets(top: 16, left: 18, bottom: 40, right: 18)
             case .colors:
-                UIEdgeInsets(top: 16,left: 18,bottom: 24,right: 18)
+                UIEdgeInsets(top: 16, left: 18, bottom: 24, right: 18)
         }
     }
     
@@ -432,7 +445,7 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
             case .list:
                 switch list[indexPath.item] {
                     case .categories:
-                        break
+                        presentCategoriesViewController()
                     case .schedule:
                         presentScheduleViewController()
                 }
@@ -499,6 +512,24 @@ extension TrackerFormViewController: TextFieldCollectionViewCellDelegate {
         }
         
         validateForm()
+    }
+}
+
+extension TrackerFormViewController: CategoriesViewControllerDelegate {
+    func categorySubmit(
+        _ viewController: CategoriesViewControllerProtocol,
+        category: TrackerCategory
+    ) {
+        selectedCategory = category
+        
+        let indexPath = IndexPath(
+            item: TrackerFormViewControllerListItems.categories.rawValue,
+            section: TrackerFormViewControllerSections.list.rawValue
+        )
+        
+        viewController.dismiss(animated: true) { [weak self] in
+            self?.formCollectionView.reloadItems(at: [indexPath])
+        }
     }
 }
 
