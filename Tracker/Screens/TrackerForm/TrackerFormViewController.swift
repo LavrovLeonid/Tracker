@@ -170,7 +170,9 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         
         let viewModel = CategoriesViewModel(
             dataStore: DataStore(),
-            categoriesModel: CategoriesModel()
+            categoriesModel: CategoriesModel(
+                initialSelectedCategory: selectedCategory
+            )
         )
         
         categoriesViewController.initialize(viewModel: viewModel)
@@ -520,6 +522,12 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         _ viewController: CategoriesViewControllerProtocol,
         category: TrackerCategory
     ) {
+        guard selectedCategory != category else {
+            viewController.dismiss(animated: true)
+            
+            return
+        }
+        
         selectedCategory = category
         
         let indexPath = IndexPath(
