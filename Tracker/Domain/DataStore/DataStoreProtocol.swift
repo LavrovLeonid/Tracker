@@ -11,6 +11,8 @@ protocol DataStoreProtocol: NSObjectProtocol {
     var isEmptyTrackerCateogries: Bool { get }
     var numberOfSections: Int { get }
     
+    func setDelegate(_ delegate: DataStoreDelegate)
+    
     func setCurrentDate(_ date: Date)
     func numberOfItemsInSection(_ section: Int) -> Int
     func category(at index: Int) -> TrackerCategory

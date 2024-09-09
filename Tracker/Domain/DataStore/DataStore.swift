@@ -94,7 +94,7 @@ final class DataStore: NSObject, DataStoreProtocol {
         trackerCategories.count
     }
     
-    convenience init(delegate: DataStoreDelegate?) {
+    convenience init(delegate: DataStoreDelegate? = nil) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             self.init(delegate: delegate)
             
@@ -112,6 +112,10 @@ final class DataStore: NSObject, DataStoreProtocol {
         
         trackerCategoriesFetchedResultsController.delegate = self
         trackerRecordsFetchedResultsController.delegate = self
+    }
+    
+    func setDelegate(_ delegate: any DataStoreDelegate) {
+        self.delegate = delegate
     }
     
     func setCurrentDate(_ date: Date) {

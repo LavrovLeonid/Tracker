@@ -7,11 +7,9 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController, PresentingViewController {
-    private lazy var trackersDataStore: DataStoreProtocol = {
-        DataStore(delegate: self)
-    }()
-    
+final class TrackersViewController:
+    UIViewController, PresentingViewController, BindableViewController {
+    // MARK: Views
     private let trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -55,13 +53,38 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         return datePicker
     }()
     
-    private var geometricParams = GeometricParams(
+    // MARK: Helpers
+    private let geometricParams = GeometricParams(
         cellCount: 2,
         leftInset: 16,
         rightInset: 16,
         cellSpacing: 9
     )
     
+    // MARK: BindableViewController
+    typealias ViewModel = TrackersViewModelProtocol
+    private(set) var viewModel: ViewModel?
+    
+    func initialize(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        
+        bind()
+    }
+    
+    func bind() {
+        viewModel?.onTrackersStateChange = { [weak self] isEmptyTrackerCateogries in
+            guard let self else { return }
+            
+            if isEmptyTrackerCateogries {
+                presentEmptyView()
+            } else {
+                presentTrackersCollectionView()
+                trackersCollectionView.reloadData()
+            }
+        }
+    }
+    
+    // MARK: Life cicle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -69,9 +92,10 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         setupSubviews()
         setupConstraints()
         
-        displayCategories()
+        viewModel?.viewDidLoad()
     }
     
+    // MARK: PresentingViewController
     func setupView() {
         navigationItem.title = "Трекеры"
         
@@ -119,6 +143,7 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         ])
     }
     
+    // MARK: Methods
     private func presentEmptyView() {
         trackersCollectionView.isHidden = true
         emptyView.isHidden = false
@@ -131,18 +156,7 @@ final class TrackersViewController: UIViewController, PresentingViewController {
         trackersCollectionView.reloadData()
     }
     
-    private func displayCategories() {
-        if trackersDataStore.isEmptyTrackerCateogries {
-            presentEmptyView()
-        } else {
-            presentTrackersCollectionView()
-        }
-    }
-    
-    private func addTracker(_ tracker: Tracker, at category: TrackerCategory) {
-        trackersDataStore.addTrackerToCategory(category, tracker: tracker)
-    }
-    
+    // MARK: Actions
     @IBAction private func addTrackerCategoryTapped() {
         let createTrackerViewController = CreateTrackerViewController()
         
@@ -155,22 +169,20 @@ final class TrackersViewController: UIViewController, PresentingViewController {
     }
     
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
-        trackersDataStore.setCurrentDate(sender.date)
-        
-        displayCategories()
+        viewModel?.setCurrentDate(sender.date)
     }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        trackersDataStore.numberOfSections
+        viewModel?.numberOfSections ?? 0
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        trackersDataStore.numberOfItemsInSection(section)
+        viewModel?.numberOfItemsInSection(section) ?? 0
     }
     
     func collectionView(
@@ -185,7 +197,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? DefaultHeaderReusableView {
-            cell.configure(with: trackersDataStore.category(at: indexPath.section).name)
+            cell.configure(with: viewModel?.categoryTitle(at: indexPath.section) ?? "")
         }
         
         return cell
@@ -197,13 +209,14 @@ extension TrackersViewController: UICollectionViewDataSource {
             for: indexPath
         )
         
-        if let cell = cell as? TrackerCollectionViewCell {
-            let tracker = trackersDataStore.tracker(at: indexPath)
+        if let cell = cell as? TrackerCollectionViewCell,
+           let viewModel {
+            let tracker = viewModel.tracker(at: indexPath)
             
             cell.setupCell(
                 with: tracker,
-                quantity: trackersDataStore.countTrackerRecords(for: tracker),
-                isSelected: trackersDataStore.isSelectedTracker(at: tracker),
+                quantity: viewModel.countTrackerRecords(for: tracker),
+                isSelected: viewModel.isSelectedTracker(at: tracker),
                 delegate: self
             )
         }
@@ -229,7 +242,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                     
                 },
                 UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
-                    self?.trackersDataStore.removeTracker(at: indexPath)
+                    self?.viewModel?.removeTracker(at: indexPath)
                 }
             ])
         })
@@ -294,9 +307,12 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCellComplete(cell: TrackerCollectionViewCell) {
-        guard let indexPath = trackersCollectionView.indexPath(for: cell) else { return }
+        guard 
+            let viewModel,
+            let indexPath = trackersCollectionView.indexPath(for: cell)
+        else { return }
         
-        trackersDataStore.completeTracker(at: indexPath)
+        view.completeTracker(at: indexPath)
     }
 }
 
@@ -307,17 +323,7 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         tracker: Tracker
     ) {
         viewController.dismiss(animated: true) { [weak self] in
-            guard let self else { return }
-            
-            addTracker(tracker, at: trackerCategory)
+            self?.viewModel?.addTrackerToCategory(trackerCategory, tracker: tracker)
         }
-    }
-}
-
-extension TrackersViewController: DataStoreDelegate {
-    func didUpdate() {
-        displayCategories()
-        
-        trackersCollectionView.reloadData()
     }
 }

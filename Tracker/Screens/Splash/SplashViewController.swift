@@ -27,6 +27,11 @@ final class SplashViewController: UIViewController {
         }
         
         let trackersViewController = TrackersViewController()
+        
+        trackersViewController.initialize(
+            viewModel: TrackersViewModel(dataStore: DataStore())
+        )
+        
         trackersViewController.tabBarItem = UITabBarItem(
             title: "Трекеры",
             image: .trackersIcon,
