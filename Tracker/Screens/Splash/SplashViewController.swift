@@ -8,10 +8,16 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
+    private let onboardingService = OnboardingService()
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        presentMainTabBar()
+        if onboardingService.isComplete {
+            presentMainTabBar()
+        } else {
+            presentOnboarding()
+        }
     }
     
     private func presentMainTabBar() {
@@ -42,5 +48,25 @@ final class SplashViewController: UIViewController {
         ]
         
         window.rootViewController = mainTabBar
+    }
+    
+    private func presentOnboarding() {
+        let onboardingViewController = OnboardingViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal
+        )
+        
+        onboardingViewController.configure(delegate: self)
+        onboardingViewController.modalPresentationStyle = .fullScreen
+        
+        present(onboardingViewController, animated: true)
+    }
+}
+
+extension SplashViewController: OnboardingViewControllerDelegate {
+    func onboardingDidComplete(_ viewController: OnboardingViewControllerProtocol) {
+        onboardingService.complete()
+        
+        presentMainTabBar()
     }
 }

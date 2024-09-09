@@ -11,6 +11,13 @@
 		F4233B092C562D2200670520 /* TrackerQuantityManagmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B082C562D2200670520 /* TrackerQuantityManagmentView.swift */; };
 		F4233B0B2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B0A2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift */; };
 		F4233B0D2C56A9D500670520 /* TrackerQuantityManagmentViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B0C2C56A9D500670520 /* TrackerQuantityManagmentViewDelegate.swift */; };
+		F43F411D2C8C18DD00E28491 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F411C2C8C18DD00E28491 /* OnboardingViewController.swift */; };
+		F43F41202C8C19AA00E28491 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F411F2C8C19AA00E28491 /* OnboardingPageViewController.swift */; };
+		F43F41222C8C1CED00E28491 /* OnboardingPageViewControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41212C8C1CED00E28491 /* OnboardingPageViewControllerProtocol.swift */; };
+		F43F41242C8D6E1F00E28491 /* OnboardingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41232C8D6E1F00E28491 /* OnboardingViewControllerDelegate.swift */; };
+		F43F41262C8D6E7D00E28491 /* OnboardingViewControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41252C8D6E7D00E28491 /* OnboardingViewControllerProtocol.swift */; };
+		F43F412A2C8DB25400E28491 /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41292C8DB25400E28491 /* OnboardingService.swift */; };
+		F43F412C2C8DB27100E28491 /* OnboardingServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F412B2C8DB27100E28491 /* OnboardingServiceProtocol.swift */; };
 		F4516C9E2C5E933100CAB0A3 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4516C9D2C5E933100CAB0A3 /* NavigationController.swift */; };
 		F4516CA32C5E95CB00CAB0A3 /* EllipseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4516CA22C5E95CB00CAB0A3 /* EllipseButton.swift */; };
 		F4516CA72C5F8B9D00CAB0A3 /* Int+getEnding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4516CA62C5F8B9D00CAB0A3 /* Int+getEnding.swift */; };
@@ -73,6 +80,13 @@
 		F4233B082C562D2200670520 /* TrackerQuantityManagmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerQuantityManagmentView.swift; sourceTree = "<group>"; };
 		F4233B0A2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCellDelegate.swift; sourceTree = "<group>"; };
 		F4233B0C2C56A9D500670520 /* TrackerQuantityManagmentViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerQuantityManagmentViewDelegate.swift; sourceTree = "<group>"; };
+		F43F411C2C8C18DD00E28491 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		F43F411F2C8C19AA00E28491 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
+		F43F41212C8C1CED00E28491 /* OnboardingPageViewControllerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewControllerProtocol.swift; sourceTree = "<group>"; };
+		F43F41232C8D6E1F00E28491 /* OnboardingViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewControllerDelegate.swift; sourceTree = "<group>"; };
+		F43F41252C8D6E7D00E28491 /* OnboardingViewControllerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewControllerProtocol.swift; sourceTree = "<group>"; };
+		F43F41292C8DB25400E28491 /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
+		F43F412B2C8DB27100E28491 /* OnboardingServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingServiceProtocol.swift; sourceTree = "<group>"; };
 		F4516C9D2C5E933100CAB0A3 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		F4516CA22C5E95CB00CAB0A3 /* EllipseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EllipseButton.swift; sourceTree = "<group>"; };
 		F4516CA62C5F8B9D00CAB0A3 /* Int+getEnding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+getEnding.swift"; sourceTree = "<group>"; };
@@ -158,6 +172,35 @@
 				F4233B0C2C56A9D500670520 /* TrackerQuantityManagmentViewDelegate.swift */,
 			);
 			path = TrackerQuantityManagmentView;
+			sourceTree = "<group>";
+		};
+		F43F411B2C8C18BA00E28491 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				F43F411C2C8C18DD00E28491 /* OnboardingViewController.swift */,
+				F43F411F2C8C19AA00E28491 /* OnboardingPageViewController.swift */,
+				F43F41212C8C1CED00E28491 /* OnboardingPageViewControllerProtocol.swift */,
+				F43F41232C8D6E1F00E28491 /* OnboardingViewControllerDelegate.swift */,
+				F43F41252C8D6E7D00E28491 /* OnboardingViewControllerProtocol.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		F43F41272C8DB23200E28491 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F43F41282C8DB24100E28491 /* OnboardingService */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F43F41282C8DB24100E28491 /* OnboardingService */ = {
+			isa = PBXGroup;
+			children = (
+				F43F41292C8DB25400E28491 /* OnboardingService.swift */,
+				F43F412B2C8DB27100E28491 /* OnboardingServiceProtocol.swift */,
+			);
+			path = OnboardingService;
 			sourceTree = "<group>";
 		};
 		F4516C9C2C5E92CA00CAB0A3 /* NavigationController */ = {
@@ -367,6 +410,7 @@
 				F4FEBFA12C56057B002765BE /* Helpers */,
 				F4FEBF862C553D44002765BE /* Models */,
 				F4FEBF762C54A3E9002765BE /* Screens */,
+				F43F41272C8DB23200E28491 /* Services */,
 				F4FEBF7D2C54ADE0002765BE /* UI */,
 			);
 			path = Tracker;
@@ -455,6 +499,7 @@
 		F4FEBF762C54A3E9002765BE /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				F43F411B2C8C18BA00E28491 /* Onboarding */,
 				F4516CAE2C5F9AB100CAB0A3 /* CreateTracker */,
 				F45712FB2C674CBD0057F76E /* Schedule */,
 				F4FEBF772C54A3FD002765BE /* Splash */,
@@ -673,6 +718,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4FEBF7F2C54ADF6002765BE /* TabBarController.swift in Sources */,
+				F43F41242C8D6E1F00E28491 /* OnboardingViewControllerDelegate.swift in Sources */,
 				F45713062C677FAC0057F76E /* ListItemCollectionCellDelegate.swift in Sources */,
 				F45713092C6872870057F76E /* TextFieldCollectionViewCellDelegate.swift in Sources */,
 				F45712E82C6630EB0057F76E /* TrackerFromViewControllerSections.swift in Sources */,
@@ -685,8 +731,11 @@
 				F457130B2C687B6F0057F76E /* TrackerFormViewControllerTextField.swift in Sources */,
 				F4D3DC022C7B301400250E05 /* DataStoreDelegate.swift in Sources */,
 				F472363F2C79C31700457B34 /* UIColor+init.swift in Sources */,
+				F43F411D2C8C18DD00E28491 /* OnboardingViewController.swift in Sources */,
+				F43F41262C8D6E7D00E28491 /* OnboardingViewControllerProtocol.swift in Sources */,
 				F45712FD2C674D0D0057F76E /* ScheduleViewController.swift in Sources */,
 				F4516CBD2C6092BB00CAB0A3 /* TrackerFormViewController.swift in Sources */,
+				F43F41202C8C19AA00E28491 /* OnboardingPageViewController.swift in Sources */,
 				F45712EA2C6632910057F76E /* TrackerFormViewControllerListItems.swift in Sources */,
 				F45E83662C53650600588A3F /* AppDelegate.swift in Sources */,
 				F45E83682C53650600588A3F /* SceneDelegate.swift in Sources */,
@@ -700,6 +749,7 @@
 				F4233B0B2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift in Sources */,
 				F45712ED2C6712A60057F76E /* ColorCollectionViewCell.swift in Sources */,
 				F45318672C63ED1300A2722F /* ListItemCollectionViewCell.swift in Sources */,
+				F43F412C2C8DB27100E28491 /* OnboardingServiceProtocol.swift in Sources */,
 				F4516CA72C5F8B9D00CAB0A3 /* Int+getEnding.swift in Sources */,
 				F4516CB02C5F9B2400CAB0A3 /* CreateTrackerViewController.swift in Sources */,
 				F4FEBF8C2C553E2B002765BE /* Tracker.swift in Sources */,
@@ -725,8 +775,10 @@
 				F45712F32C6717C60057F76E /* OutlineButton.swift in Sources */,
 				F4516CB92C608FF600CAB0A3 /* BaseButton.swift in Sources */,
 				F4516C9E2C5E933100CAB0A3 /* NavigationController.swift in Sources */,
+				F43F412A2C8DB25400E28491 /* OnboardingService.swift in Sources */,
 				F4516CB42C5F9B9C00CAB0A3 /* CreateTrackerViewControllerProtocol.swift in Sources */,
 				F4516CA32C5E95CB00CAB0A3 /* EllipseButton.swift in Sources */,
+				F43F41222C8C1CED00E28491 /* OnboardingPageViewControllerProtocol.swift in Sources */,
 				F45713032C6773550057F76E /* ListItemCollectionCellEndAdorment.swift in Sources */,
 				F4FB8A9E2C614C8700A47C39 /* TextFieldCollectionViewCell.swift in Sources */,
 			);
