@@ -13,4 +13,5 @@ protocol CategoriesModelProtocol {
     
     // MARK: Methods
     func setSelectedCategory(_ category: TrackerCategory)
+    func resetSelectedCategory()
 }

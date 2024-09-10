@@ -8,8 +8,11 @@
 import Foundation
 
 protocol CategoriesViewControllerDelegate: AnyObject {
-    func categorySubmit(
+    func selectCategory(
         _ viewController: CategoriesViewControllerProtocol,
         category: TrackerCategory
+    )
+    func resetCategory(
+        _ viewController: CategoriesViewControllerProtocol
     )
 }

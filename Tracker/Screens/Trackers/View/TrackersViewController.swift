@@ -162,16 +162,51 @@ final class TrackersViewController:
         trackersCollectionView.reloadData()
     }
     
-    // MARK: Actions
-    @IBAction private func addTrackerCategoryTapped() {
+    private func presentCreateTrackerCategoryViewController() {
         let createTrackerViewController = CreateTrackerViewController()
         
         createTrackerViewController.configure(with: self)
         
         present(
-            UINavigationController(rootViewController: createTrackerViewController), 
+            UINavigationController(rootViewController: createTrackerViewController),
             animated: true
         )
+    }
+    
+    private func presentTrackerFormViewController(
+        with tracker: Tracker,
+        at category: TrackerCategory
+    ) {
+        let trackerFormViewController = TrackerFormViewController()
+        
+        present(
+            UINavigationController(rootViewController: trackerFormViewController),
+            animated: true
+        )
+    }
+    
+    private func presentAlertToRemoveTracker(at indexPath: IndexPath) {
+        let alertController = UIAlertController(
+            title: "Уверены что хотите удалить трекер?",
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        alertController.addAction(
+            UIAlertAction(title: "Удалить", style: .destructive) { _ in
+                self.viewModel?.removeTracker(at: indexPath)
+            }
+        )
+        alertController.addAction(
+            UIAlertAction(title: "Отменить", style: .cancel)
+        )
+        
+        present(alertController, animated: true)
+    }
+    
+    // MARK: Actions
+    @IBAction private func addTrackerCategoryTapped() {
+        presentCreateTrackerCategoryViewController()
     }
     
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -203,7 +238,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? DefaultHeaderReusableView {
-            cell.configure(with: viewModel?.categoryTitle(at: indexPath.section) ?? "")
+            cell.configure(with: viewModel?.category(at: indexPath.section).name ?? "")
         }
         
         return cell
@@ -244,11 +279,16 @@ extension TrackersViewController: UICollectionViewDelegate {
                 UIAction(title: "Закрепить") { _ in
                     
                 },
-                UIAction(title: "Редактировать") { _ in
+                UIAction(title: "Редактировать") { [weak self] _ in
+                    guard let self, let viewModel else { return }
                     
+                    presentTrackerFormViewController(
+                        with: viewModel.tracker(at: indexPath),
+                        at: viewModel.category(at: indexPath.section)
+                    )
                 },
                 UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
-                    self?.viewModel?.removeTracker(at: indexPath)
+                    self?.presentAlertToRemoveTracker(at: indexPath)
                 }
             ])
         })

@@ -29,7 +29,7 @@ final class SplashViewController: UIViewController {
         let trackersViewController = TrackersViewController()
         
         trackersViewController.initialize(
-            viewModel: TrackersViewModel(dataStore: DataStore())
+            viewModel: TrackersViewModel(dataStore: TrackersDataStore())
         )
         
         trackersViewController.tabBarItem = UITabBarItem(

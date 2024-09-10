@@ -17,7 +17,7 @@ protocol TrackersViewModelProtocol {
     // MARK: Methods
     func viewDidLoad()
     func numberOfItemsInSection(_ section: Int) -> Int
-    func categoryTitle(at section: Int) -> String
+    func category(at section: Int) -> TrackerCategory
     func tracker(at indexPath: IndexPath) -> Tracker
     func countTrackerRecords(for tracker: Tracker) -> Int
     func isSelectedTracker(at tracker: Tracker) -> Bool

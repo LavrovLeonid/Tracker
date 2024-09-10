@@ -9,7 +9,7 @@ import Foundation
 
 final class TrackersViewModel: TrackersViewModelProtocol {
     // MARK: Model
-    private var trackersDataStore: DataStoreProtocol
+    private var trackersDataStore: TrackersDataStoreProtocol
     
     // MARK: Bindings
     var onTrackersStateChange: Binding<Bool>?
@@ -20,7 +20,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     // MARK: Initialization
-    init(dataStore: DataStoreProtocol) {
+    init(dataStore: TrackersDataStoreProtocol) {
         trackersDataStore = dataStore
         
         trackersDataStore.setDelegate(self)
@@ -37,14 +37,16 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func setCurrentDate(_ date: Date) {
         trackersDataStore.setCurrentDate(date)
+        
+        onTrackersStateChange?(trackersDataStore.isEmptyTrackerCateogries)
     }
     
     func addTrackerToCategory(_ category: TrackerCategory, tracker: Tracker) {
         trackersDataStore.addTrackerToCategory(category, tracker: tracker)
     }
     
-    func categoryTitle(at section: Int) -> String {
-        trackersDataStore.category(at: section).name
+    func category(at section: Int) -> TrackerCategory {
+        trackersDataStore.category(at: section)
     }
     
     func tracker(at indexPath: IndexPath) -> Tracker {
@@ -70,7 +72,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
 }
 
 // MARK: DataStoreDelegate
-extension TrackersViewModel: DataStoreDelegate {
+extension TrackersViewModel: TrackersDataStoreDelegate {
     func didUpdate() {
         onTrackersStateChange?(trackersDataStore.isEmptyTrackerCateogries)
     }

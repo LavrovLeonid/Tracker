@@ -1,5 +1,5 @@
 //
-//  DataStore.swift
+//  TrackersDataStore.swift
 //  Tracker
 //
 //  Created by Леонид Лавров on 8/24/24.
@@ -8,7 +8,7 @@
 import CoreData
 import UIKit
 
-final class DataStore: NSObject, DataStoreProtocol {
+final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
     private var context: NSManagedObjectContext
     
     private let calendar = Calendar.current
@@ -78,13 +78,14 @@ final class DataStore: NSObject, DataStoreProtocol {
             guard !filteredTrackers.isEmpty else { return nil }
             
             return TrackerCategory(
+                id: category.id ?? UUID(),
                 name: category.name ?? "",
                 trackers: filteredTrackers
             )
         }
     }
     
-    private weak var delegate: DataStoreDelegate?
+    private weak var delegate: TrackersDataStoreDelegate?
     
     var isEmptyTrackerCateogries: Bool {
         trackerCategories.isEmpty
@@ -94,7 +95,7 @@ final class DataStore: NSObject, DataStoreProtocol {
         trackerCategories.count
     }
     
-    convenience init(delegate: DataStoreDelegate? = nil) {
+    convenience init(delegate: TrackersDataStoreDelegate? = nil) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             self.init(delegate: delegate)
             
@@ -104,7 +105,7 @@ final class DataStore: NSObject, DataStoreProtocol {
         self.init(context: appDelegate.persistentContainer.viewContext, delegate: delegate)
     }
     
-    init(context: NSManagedObjectContext, delegate: DataStoreDelegate?) {
+    init(context: NSManagedObjectContext, delegate: TrackersDataStoreDelegate?) {
         self.context = context
         self.delegate = delegate
         
@@ -114,7 +115,7 @@ final class DataStore: NSObject, DataStoreProtocol {
         trackerRecordsFetchedResultsController.delegate = self
     }
     
-    func setDelegate(_ delegate: any DataStoreDelegate) {
+    func setDelegate(_ delegate: any TrackersDataStoreDelegate) {
         self.delegate = delegate
     }
     
@@ -157,7 +158,28 @@ final class DataStore: NSObject, DataStoreProtocol {
     func addCategory(_ category: TrackerCategory) {
         let trackerCategoryEntity = TrackerCategoryEntity(context: context)
         
+        trackerCategoryEntity.id = category.id
         trackerCategoryEntity.name = category.name
+        
+        contextSave()
+    }
+    
+    func removeCategory(_ category: TrackerCategory) {
+        guard
+            let categoryEntity = try? fetchTrackerCategoryEntity(at: category)
+        else { return }
+        
+        context.delete(categoryEntity)
+        
+        contextSave()
+    }
+    
+    func editCategory(_ category: TrackerCategory) {
+        guard
+            let categoryEntity = try? fetchTrackerCategoryEntity(at: category)
+        else { return }
+        
+        categoryEntity.name = category.name
         
         contextSave()
     }
@@ -165,13 +187,12 @@ final class DataStore: NSObject, DataStoreProtocol {
     func addTrackerToCategory(_ trackerCategory: TrackerCategory, tracker: Tracker) {
         let trackerEntity = createTrackerEntity(tracker)
         
-        if let trackerCategoryEntity = trackerCategoriesFetchedResultsController.fetchedObjects?.first(where: {
-            trackerCategory.name == $0.name
-        }) {
+        if let trackerCategoryEntity = try? fetchTrackerCategoryEntity(at: trackerCategory) {
             trackerCategoryEntity.addToTrackers(trackerEntity)
         } else {
             let trackerCategoryEntity = TrackerCategoryEntity(context: context)
             
+            trackerCategoryEntity.id = trackerCategory.id
             trackerCategoryEntity.name = trackerCategory.name
             trackerCategoryEntity.addToTrackers(trackerEntity)
         }
@@ -215,6 +236,10 @@ final class DataStore: NSObject, DataStoreProtocol {
         contextSave()
     }
     
+    func hasCategory(with name: String) -> Bool {
+        trackerCategories.contains { $0.name == name }
+    }
+    
     private func createTrackerEntity(_ tracker: Tracker) -> TrackerEntity {
         let trackerEntity = TrackerEntity(context: context)
         
@@ -234,12 +259,12 @@ final class DataStore: NSObject, DataStoreProtocol {
         let fetchRequest = TrackerCategoryEntity.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(
-            format: "name == %@",
-            trackerCategory.name as CVarArg
+            format: "id == %@",
+            trackerCategory.id as CVarArg
         )
         
         guard let trackerCategoryEntity = try context.fetch(fetchRequest).first else {
-            throw DataStoreError.notFoundCategory
+            throw TrackersDataStoreError.notFoundCategory
         }
         
         return trackerCategoryEntity
@@ -254,7 +279,7 @@ final class DataStore: NSObject, DataStoreProtocol {
         )
         
         guard let trackerEntitiy = try context.fetch(fetchRequest).first else {
-            throw DataStoreError.notFoundCategory
+            throw TrackersDataStoreError.notFoundCategory
         }
         
         return trackerEntitiy
@@ -280,7 +305,7 @@ final class DataStore: NSObject, DataStoreProtocol {
             let id = trackerEntity.id,
             let hexColor = trackerEntity.color,
             let color = UIColor(hex: hexColor)
-        else { throw DataStoreError.trackerDecodingError }
+        else { throw TrackersDataStoreError.trackerDecodingError }
         
         let type = TrackerType(rawValue: Int(trackerEntity.type)) ?? .habit
         let schedules = trackerEntity.schedules?.compactMap { WeekDay(rawValue: $0) } ?? []
@@ -304,7 +329,7 @@ final class DataStore: NSObject, DataStoreProtocol {
     }
 }
 
-extension DataStore: NSFetchedResultsControllerDelegate {
+extension TrackersDataStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.didUpdate()
     }

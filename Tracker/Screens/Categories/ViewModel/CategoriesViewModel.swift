@@ -9,58 +9,66 @@ import Foundation
 
 final class CategoriesViewModel: CategoriesViewModelProtocol {
     // MARK: Models
-    private var trackersDataStore: DataStoreProtocol
+    private var categoriesDataStore: CategoriesDataStoreProtocol
     private var categoriesModel: CategoriesModelProtocol
     
     // MARK: Bindings
     var onTrackerCategoriesStateChange: Binding<Bool>?
-    var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory>?
+    var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>?
     
     // MARK: Properties
     var catgoriesCount: Int {
-        trackersDataStore.numberOfSections
+        categoriesDataStore.categoriesCount
     }
     
     // MARK: Initialization
     init(
-        dataStore: DataStoreProtocol,
+        categoriesDataStore: CategoriesDataStoreProtocol,
         categoriesModel: CategoriesModelProtocol
     ) {
-        trackersDataStore = dataStore
+        self.categoriesDataStore = categoriesDataStore
         self.categoriesModel = categoriesModel
         
-        trackersDataStore.setDelegate(self)
+        categoriesDataStore.setDelegate(self)
     }
     
     // MARK: Methods
     func viewDidLoad() {
-        onTrackerCategoriesStateChange?(trackersDataStore.isEmptyTrackerCateogries)
+        onTrackerCategoriesStateChange?(categoriesDataStore.isEmptyCateogries)
     }
     
-    func categoryName(at indexPath: IndexPath) -> String {
-        trackersDataStore.category(at: indexPath.item).name
+    func category(at indexPath: IndexPath) -> TrackerCategory {
+        categoriesDataStore.category(at: indexPath.item)
     }
     
     func isSelectedCategory(at indexPath: IndexPath) -> Bool {
-        trackersDataStore.category(at: indexPath.item) == categoriesModel.selectedCategory
+        categoriesDataStore.category(at: indexPath.item) == categoriesModel.selectedCategory
     }
     
     func selectCategory(at indexPath: IndexPath) {
-        let category = trackersDataStore.category(at: indexPath.item)
+        let category = categoriesDataStore.category(at: indexPath.item)
         
         categoriesModel.setSelectedCategory(category)
         
         onSelectedTrackerCategoryStateChange?(category)
     }
     
-    func addCategory() {
+    func deleteCategory(at indexPath: IndexPath) {
+        let category = categoriesDataStore.category(at: indexPath.item)
         
+        if category == categoriesModel.selectedCategory {
+            categoriesModel.resetSelectedCategory()
+            
+            onSelectedTrackerCategoryStateChange?(nil)
+        }
+        
+        categoriesDataStore.removeCategory(category)
     }
 }
 
 // MARK: DataStoreDelegate
-extension CategoriesViewModel: DataStoreDelegate {
+extension CategoriesViewModel: CategoriesDataStoreDelegate {
     func didUpdate() {
-        onTrackerCategoriesStateChange?(trackersDataStore.isEmptyTrackerCateogries)
+        onTrackerCategoriesStateChange?(categoriesDataStore.isEmptyCateogries)
     }
 }

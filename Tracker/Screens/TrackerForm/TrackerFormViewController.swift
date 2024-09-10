@@ -87,6 +87,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
+        collectionView.keyboardDismissMode = .onDrag
         
         return collectionView
     }()
@@ -132,6 +133,14 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         self.delegate = delegate
     }
     
+    func configure(
+        with tracker: Tracker,
+        at category: TrackerCategory,
+        delegate: TrackerFormViewControllerDelegate?
+    ) {
+        // TODO: Натсроить экран редактирования трекера
+    }
+    
     func setupView() {
         title = trackerType.title
         navigationItem.hidesBackButton = true
@@ -169,7 +178,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         let categoriesViewController = CategoriesViewController()
         
         let viewModel = CategoriesViewModel(
-            dataStore: DataStore(),
+            categoriesDataStore: CategoriesDataStore(),
             categoriesModel: CategoriesModel(
                 initialSelectedCategory: selectedCategory
             )
@@ -518,7 +527,7 @@ extension TrackerFormViewController: TextFieldCollectionViewCellDelegate {
 }
 
 extension TrackerFormViewController: CategoriesViewControllerDelegate {
-    func categorySubmit(
+    func selectCategory(
         _ viewController: CategoriesViewControllerProtocol,
         category: TrackerCategory
     ) {
@@ -538,6 +547,17 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         viewController.dismiss(animated: true) { [weak self] in
             self?.formCollectionView.reloadItems(at: [indexPath])
         }
+    }
+    
+    func resetCategory(_ viewController: any CategoriesViewControllerProtocol) {
+        selectedCategory = nil
+        
+        let indexPath = IndexPath(
+            item: TrackerFormViewControllerListItems.categories.rawValue,
+            section: TrackerFormViewControllerSections.list.rawValue
+        )
+        
+        formCollectionView.reloadItems(at: [indexPath])
     }
 }
 

@@ -17,4 +17,8 @@ final class CategoriesModel: CategoriesModelProtocol {
     func setSelectedCategory(_ category: TrackerCategory) {
         selectedCategory = category
     }
+    
+    func resetSelectedCategory() {
+        selectedCategory = nil
+    }
 }

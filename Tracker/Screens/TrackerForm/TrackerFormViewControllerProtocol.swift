@@ -9,4 +9,9 @@ import UIKit
 
 protocol TrackerFormViewControllerProtocol: UIViewController {
     func configure(trackerType: TrackerType, delegate: TrackerFormViewControllerDelegate?)
+    func configure(
+        with tracker: Tracker,
+        at category: TrackerCategory,
+        delegate: TrackerFormViewControllerDelegate?
+    )
 }

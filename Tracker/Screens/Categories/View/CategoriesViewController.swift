@@ -9,7 +9,6 @@ import UIKit
 
 final class CategoriesViewController:
     UIViewController, PresentingViewController, BindableViewController, CategoriesViewControllerProtocol {
-    
     // MARK: Views
     private lazy var categoriesCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -34,7 +33,7 @@ final class CategoriesViewController:
         let primaryButton = PrimaryButton()
         
         primaryButton.setTitle("Добавить категорию", for: .normal)
-        primaryButton.addTarget(self, action: #selector(submitButtonTapped), for: .touchUpInside)
+        primaryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
         
         return primaryButton
     }()
@@ -83,7 +82,11 @@ final class CategoriesViewController:
         viewModel?.onSelectedTrackerCategoryStateChange = { [weak self] category in
             guard let self else { return }
             
-            self.delegate?.categorySubmit(self, category: category)
+            if let category {
+                self.delegate?.selectCategory(self, category: category)
+            } else {
+                self.delegate?.resetCategory(self)
+            }
         }
     }
     
@@ -164,8 +167,46 @@ final class CategoriesViewController:
         emptyView.isHidden = true
     }
     
-    @IBAction private func submitButtonTapped() {
-        viewModel?.addCategory()
+    private func presentCategoryForm(with category: TrackerCategory? = nil) {
+        let categoryFormViewController = CategoryFormViewController()
+        
+        let viewModel = CategoryFormViewModel(
+            categoriesDataStore: CategoriesDataStore(),
+            categoryFormModel: CategoryFormModel(
+                initialCategory: category
+            )
+        )
+        
+        categoryFormViewController.initialize(viewModel: viewModel)
+        categoryFormViewController.configure(delegate: self)
+        
+        navigationController?.pushViewController(
+            categoryFormViewController, 
+            animated: true
+        )
+    }
+    
+    private func presentAlertToRemoveCategory(at indexPath: IndexPath) {
+        let alertController = UIAlertController(
+            title: "Эта категория точно не нужна?",
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        alertController.addAction(
+            UIAlertAction(title: "Удалить", style: .destructive) { _ in
+                self.viewModel?.deleteCategory(at: indexPath)
+            }
+        )
+        alertController.addAction(
+            UIAlertAction(title: "Отменить", style: .cancel)
+        )
+        
+        present(alertController, animated: true)
+    }
+    
+    @IBAction private func addCategoryButtonTapped() {
+        presentCategoryForm()
     }
 }
 
@@ -193,7 +234,7 @@ extension CategoriesViewController: UICollectionViewDataSource {
                     in: viewModel.catgoriesCount
                 )
             )
-            cell.configure(title: viewModel.categoryName(at: indexPath))
+            cell.configure(title: viewModel.category(at: indexPath).name)
             cell.configure(
                 endAdorment: viewModel.isSelectedCategory(at: indexPath) ? .check : .none
             )
@@ -249,5 +290,35 @@ extension CategoriesViewController: UICollectionViewDelegateFlowLayout {
         didSelectItemAt indexPath: IndexPath
     ) {
         viewModel?.selectCategory(at: indexPath)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        
+        return UIContextMenuConfiguration(actionProvider: { _ in
+            UIMenu(children: [
+                UIAction(title: "Редактировать") { [weak self] _ in
+                    guard let self, let viewModel else { return }
+                    
+                    presentCategoryForm(with: viewModel.category(at: indexPath))
+                },
+                UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
+                    self?.presentAlertToRemoveCategory(at: indexPath)
+                }
+            ])
+        })
+    }
+}
+
+extension CategoriesViewController: CategoryFormViewControllerDelegate {
+    func submitCategory(
+        _ viewController: any CategoryFormViewControllerProtocol,
+        category: TrackerCategory
+    ) {
+        delegate?.selectCategory(self, category: category)
     }
 }

@@ -10,15 +10,15 @@ import Foundation
 protocol CategoriesViewModelProtocol {
     // MARK: Bindings
     var onTrackerCategoriesStateChange: Binding<Bool>? { get set }
-    var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory>? { get set }
+    var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>? { get set }
     
     // MARK: Properties
     var catgoriesCount: Int { get }
     
     // MARK: Methods
     func viewDidLoad()
-    func categoryName(at indexPath: IndexPath) -> String
+    func category(at indexPath: IndexPath) -> TrackerCategory
     func isSelectedCategory(at indexPath: IndexPath) -> Bool
     func selectCategory(at indexPath: IndexPath)
-    func addCategory()
+    func deleteCategory(at indexPath: IndexPath)
 }
