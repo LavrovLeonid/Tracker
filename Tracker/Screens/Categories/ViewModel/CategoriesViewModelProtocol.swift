@@ -9,7 +9,8 @@ import Foundation
 
 protocol CategoriesViewModelProtocol {
     // MARK: Bindings
-    var onTrackerCategoriesStateChange: Binding<Bool>? { get set }
+    var onTrackerCategoriesEmptyStateChange: Binding<Bool>? { get set }
+    var onTrackerCategoriesStateChange: Binding<DataStoreUpdates>? { get set }
     var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>? { get set }
     
     // MARK: Properties

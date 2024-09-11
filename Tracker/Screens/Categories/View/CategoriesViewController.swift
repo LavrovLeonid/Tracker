@@ -62,10 +62,10 @@ final class CategoriesViewController:
     var viewModel: ViewModel
     
     func bind() {
-        viewModel.onTrackerCategoriesStateChange = { [weak self] isEmptyTrackerCateogries in
+        viewModel.onTrackerCategoriesEmptyStateChange = { [weak self] isEmptyTrackerCategories in
             guard let self else { return }
             
-            if isEmptyTrackerCateogries {
+            if isEmptyTrackerCategories {
                 presentEmptyView()
             } else {
                 presentCategoriesCollectionView()
@@ -74,12 +74,28 @@ final class CategoriesViewController:
         }
         
         viewModel.onSelectedTrackerCategoryStateChange = { [weak self] category in
-            guard let self else { return }
+            guard let self, let delegate else { return }
             
             if let category {
-                self.delegate?.selectCategory(self, category: category)
+                delegate.selectCategory(self, category: category)
             } else {
-                self.delegate?.resetCategory(self)
+                delegate.resetCategory(self)
+            }
+        }
+        
+        viewModel.onTrackerCategoriesStateChange = { [weak self] updates in
+            guard let self else { return }
+            
+            categoriesCollectionView.performBatchUpdates {
+                self.categoriesCollectionView.insertItems(
+                    at: updates.insertedIndexes.map { IndexPath(item: $0, section: 0) }
+                )
+                self.categoriesCollectionView.reloadItems(
+                    at: updates.updatedIndexes.map { IndexPath(item: $0, section: 0) }
+                )
+                self.categoriesCollectionView.deleteItems(
+                    at: updates.deletedIndexes.map { IndexPath(item: $0, section: 0) }
+                )
             }
         }
     }

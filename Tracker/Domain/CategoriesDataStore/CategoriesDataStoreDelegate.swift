@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CategoriesDataStoreDelegate: AnyObject {
-    func didUpdate()
+    func didUpdate(with updates: DataStoreUpdates)
 }

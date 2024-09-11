@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F40DF8432C915B8900A4377B /* DataStoreUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40DF8422C915B8900A4377B /* DataStoreUpdates.swift */; };
 		F4233B032C561EAA00670520 /* TrackerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B022C561EAA00670520 /* TrackerCardView.swift */; };
 		F4233B092C562D2200670520 /* TrackerQuantityManagmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B082C562D2200670520 /* TrackerQuantityManagmentView.swift */; };
 		F4233B0B2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4233B0A2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift */; };
@@ -26,7 +27,6 @@
 		F43F413F2C8EC76A00E28491 /* CategoriesViewControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F413E2C8EC76A00E28491 /* CategoriesViewControllerProtocol.swift */; };
 		F43F41412C8EC79800E28491 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41402C8EC79800E28491 /* CategoriesViewModel.swift */; };
 		F43F41432C8EC7B200E28491 /* CategoriesViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41422C8EC7B200E28491 /* CategoriesViewModelProtocol.swift */; };
-		F43F41452C8ECB8C00E28491 /* BindingWithoutValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41442C8ECB8C00E28491 /* BindingWithoutValue.swift */; };
 		F43F41482C8ED84E00E28491 /* CategoriesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41472C8ED84E00E28491 /* CategoriesModel.swift */; };
 		F43F414A2C8ED9E700E28491 /* CategoriesModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F41492C8ED9E700E28491 /* CategoriesModelProtocol.swift */; };
 		F43F414C2C8EEAEB00E28491 /* CategoriesViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F414B2C8EEAEB00E28491 /* CategoriesViewControllerDelegate.swift */; };
@@ -99,6 +99,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F40DF8422C915B8900A4377B /* DataStoreUpdates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreUpdates.swift; sourceTree = "<group>"; };
 		F4233B022C561EAA00670520 /* TrackerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCardView.swift; sourceTree = "<group>"; };
 		F4233B082C562D2200670520 /* TrackerQuantityManagmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerQuantityManagmentView.swift; sourceTree = "<group>"; };
 		F4233B0A2C56A72400670520 /* TrackerCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCellDelegate.swift; sourceTree = "<group>"; };
@@ -118,7 +119,6 @@
 		F43F413E2C8EC76A00E28491 /* CategoriesViewControllerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewControllerProtocol.swift; sourceTree = "<group>"; };
 		F43F41402C8EC79800E28491 /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
 		F43F41422C8EC7B200E28491 /* CategoriesViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModelProtocol.swift; sourceTree = "<group>"; };
-		F43F41442C8ECB8C00E28491 /* BindingWithoutValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingWithoutValue.swift; sourceTree = "<group>"; };
 		F43F41472C8ED84E00E28491 /* CategoriesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesModel.swift; sourceTree = "<group>"; };
 		F43F41492C8ED9E700E28491 /* CategoriesModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesModelProtocol.swift; sourceTree = "<group>"; };
 		F43F414B2C8EEAEB00E28491 /* CategoriesViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -203,6 +203,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F40DF8412C915B5500A4377B /* DataStore */ = {
+			isa = PBXGroup;
+			children = (
+				F40DF8422C915B8900A4377B /* DataStoreUpdates.swift */,
+			);
+			path = DataStore;
+			sourceTree = "<group>";
+		};
+		F40DF8442C915BC900A4377B /* Bindings */ = {
+			isa = PBXGroup;
+			children = (
+				F43F41302C8EB38700E28491 /* Binding.swift */,
+			);
+			path = Bindings;
+			sourceTree = "<group>";
+		};
 		F4233B012C561E8A00670520 /* TrackerCardView */ = {
 			isa = PBXGroup;
 			children = (
@@ -713,9 +729,9 @@
 		F4FEBF862C553D44002765BE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				F43F41302C8EB38700E28491 /* Binding.swift */,
-				F43F41442C8ECB8C00E28491 /* BindingWithoutValue.swift */,
 				F4FEBF8E2C553F13002765BE /* WeekDay.swift */,
+				F40DF8442C915BC900A4377B /* Bindings */,
+				F40DF8412C915B5500A4377B /* DataStore */,
 				F4FEBF8A2C553E1F002765BE /* Tracker */,
 				F4FEBF872C553D65002765BE /* TrackerCategory */,
 				F4FEBF902C55405E002765BE /* TrackerRecord */,
@@ -895,7 +911,6 @@
 				F457130B2C687B6F0057F76E /* TrackerFormViewControllerTextField.swift in Sources */,
 				F43F414A2C8ED9E700E28491 /* CategoriesModelProtocol.swift in Sources */,
 				F4D3DC022C7B301400250E05 /* TrackersDataStoreDelegate.swift in Sources */,
-				F43F41452C8ECB8C00E28491 /* BindingWithoutValue.swift in Sources */,
 				F43F41352C8EB5C800E28491 /* TrackersViewModelProtocol.swift in Sources */,
 				F46F3C242C8F2D9200A38988 /* CategoriesDataStoreProtocol.swift in Sources */,
 				F472363F2C79C31700457B34 /* UIColor+init.swift in Sources */,
@@ -930,6 +945,7 @@
 				F45318692C63F48100A2722F /* ListItemCollectionCellPlacement.swift in Sources */,
 				F4EABE352C7AE64D00CC30B7 /* UIColor+hexString.swift in Sources */,
 				F4FEBF922C554071002765BE /* TrackerRecord.swift in Sources */,
+				F40DF8432C915B8900A4377B /* DataStoreUpdates.swift in Sources */,
 				F4D3DC002C7B1D3900250E05 /* TrackersDataStoreError.swift in Sources */,
 				F4FEBF792C54A418002765BE /* SplashViewController.swift in Sources */,
 				F4FEBF822C54AE7E002765BE /* TrackersViewController.swift in Sources */,

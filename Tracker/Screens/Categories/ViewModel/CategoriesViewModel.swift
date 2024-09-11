@@ -13,7 +13,8 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     private let categoriesModel: CategoriesModelProtocol
     
     // MARK: Bindings
-    var onTrackerCategoriesStateChange: Binding<Bool>?
+    var onTrackerCategoriesEmptyStateChange: Binding<Bool>?
+    var onTrackerCategoriesStateChange: Binding<DataStoreUpdates>?
     var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>?
     
     // MARK: Properties
@@ -34,7 +35,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     
     // MARK: Methods
     func viewDidLoad() {
-        onTrackerCategoriesStateChange?(categoriesDataStore.isEmptyCateogries)
+        onTrackerCategoriesEmptyStateChange?(categoriesDataStore.isEmptyCategories)
     }
     
     func category(at indexPath: IndexPath) -> TrackerCategory {
@@ -68,7 +69,11 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
 
 // MARK: DataStoreDelegate
 extension CategoriesViewModel: CategoriesDataStoreDelegate {
-    func didUpdate() {
-        onTrackerCategoriesStateChange?(categoriesDataStore.isEmptyCateogries)
+    func didUpdate(with updates: DataStoreUpdates) {
+        if categoriesDataStore.isEmptyCategories {
+            onTrackerCategoriesEmptyStateChange?(categoriesDataStore.isEmptyCategories)
+        } else {
+            onTrackerCategoriesStateChange?(updates)
+        }
     }
 }

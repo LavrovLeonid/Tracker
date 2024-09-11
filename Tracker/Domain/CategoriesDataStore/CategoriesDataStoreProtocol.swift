@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CategoriesDataStoreProtocol: NSObjectProtocol {
-    var isEmptyCateogries: Bool { get }
+    var isEmptyCategories: Bool { get }
     var categoriesCount: Int { get }
     var delegate: CategoriesDataStoreDelegate? { get set }
     

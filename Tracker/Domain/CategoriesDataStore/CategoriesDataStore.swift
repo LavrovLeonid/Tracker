@@ -11,6 +11,10 @@ import UIKit
 final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
     private var context: NSManagedObjectContext
     
+    private var insertedIndexes = IndexSet()
+    private var deletedIndexes = IndexSet()
+    private var updatedIndexes = IndexSet()
+    
     private lazy var categoriesFetchedResultsController = {
         let fetchRequest = TrackerCategoryEntity.fetchRequest()
         
@@ -46,7 +50,7 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
     
     weak var delegate: CategoriesDataStoreDelegate?
     
-    var isEmptyCateogries: Bool {
+    var isEmptyCategories: Bool {
         categoriesFetchedResultsController.sections?.isEmpty ?? true
     }
     
@@ -136,12 +140,43 @@ extension CategoriesDataStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(
         _ controller: NSFetchedResultsController<NSFetchRequestResult>
     ) {
-        delegate?.didUpdate()
+        delegate?.didUpdate(
+            with: DataStoreUpdates(
+                insertedIndexes: insertedIndexes,
+                updatedIndexes: updatedIndexes,
+                deletedIndexes: deletedIndexes
+            )
+        )
+        
+        insertedIndexes.removeAll()
+        updatedIndexes.removeAll()
+        deletedIndexes.removeAll()
     }
     
-    func controllerWillChangeContent(
-        _ controller: NSFetchedResultsController<NSFetchRequestResult>
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
     ) {
-        
+        switch type {
+            case .insert:
+                if let newIndexPath {
+                    insertedIndexes.insert(newIndexPath.item)
+                }
+            case .delete:
+                if let indexPath {
+                    deletedIndexes.insert(indexPath.item)
+                }
+            case .move:
+                break
+            case .update:
+                if let indexPath {
+                    updatedIndexes.insert(indexPath.item)
+                }
+            default:
+                break
+        }
     }
 }
