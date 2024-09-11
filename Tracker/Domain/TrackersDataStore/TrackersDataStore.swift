@@ -85,7 +85,7 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         }
     }
     
-    private weak var delegate: TrackersDataStoreDelegate?
+    weak var delegate: TrackersDataStoreDelegate?
     
     var isEmptyTrackerCateogries: Bool {
         trackerCategories.isEmpty
@@ -113,10 +113,6 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         
         trackerCategoriesFetchedResultsController.delegate = self
         trackerRecordsFetchedResultsController.delegate = self
-    }
-    
-    func setDelegate(_ delegate: any TrackersDataStoreDelegate) {
-        self.delegate = delegate
     }
     
     func setCurrentDate(_ date: Date) {

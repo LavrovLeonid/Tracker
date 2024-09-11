@@ -15,5 +15,5 @@ protocol CategoryFormViewModelProtocol {
     
     func viewDidLoad()
     func changeCategoryName(_ name: String)
-    func submit()
+    func submitButtonTapped()
 }

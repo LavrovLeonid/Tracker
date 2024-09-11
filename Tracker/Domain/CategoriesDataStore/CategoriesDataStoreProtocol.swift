@@ -10,8 +10,8 @@ import Foundation
 protocol CategoriesDataStoreProtocol: NSObjectProtocol {
     var isEmptyCateogries: Bool { get }
     var categoriesCount: Int { get }
+    var delegate: CategoriesDataStoreDelegate? { get set }
     
-    func setDelegate(_ delegate: CategoriesDataStoreDelegate)
     func category(at index: Int) -> TrackerCategory
     func addCategory(_ category: TrackerCategory)
     func removeCategory(_ category: TrackerCategory)

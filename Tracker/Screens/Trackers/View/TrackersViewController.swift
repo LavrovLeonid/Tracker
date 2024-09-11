@@ -63,16 +63,10 @@ final class TrackersViewController:
     
     // MARK: BindableViewController
     typealias ViewModel = TrackersViewModelProtocol
-    private(set) var viewModel: ViewModel?
-    
-    func initialize(viewModel: ViewModel) {
-        self.viewModel = viewModel
-        
-        bind()
-    }
+    private(set) var viewModel: ViewModel
     
     func bind() {
-        viewModel?.onTrackersStateChange = { [weak self] isEmptyTrackerCateogries in
+        viewModel.onTrackersStateChange = { [weak self] isEmptyTrackerCateogries in
             guard let self else { return }
             
             if isEmptyTrackerCateogries {
@@ -85,6 +79,18 @@ final class TrackersViewController:
     }
     
     // MARK: Life cicle
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        bind()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -92,7 +98,7 @@ final class TrackersViewController:
         setupSubviews()
         setupConstraints()
         
-        viewModel?.viewDidLoad()
+        viewModel.viewDidLoad()
     }
     
     // MARK: PresentingViewController
@@ -193,8 +199,8 @@ final class TrackersViewController:
         )
         
         alertController.addAction(
-            UIAlertAction(title: "Удалить", style: .destructive) { _ in
-                self.viewModel?.removeTracker(at: indexPath)
+            UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+                self?.viewModel.removeTracker(at: indexPath)
             }
         )
         alertController.addAction(
@@ -210,20 +216,20 @@ final class TrackersViewController:
     }
     
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
-        viewModel?.setCurrentDate(sender.date)
+        viewModel.setCurrentDate(sender.date)
     }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        viewModel?.numberOfSections ?? 0
+        viewModel.numberOfSections
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        viewModel?.numberOfItemsInSection(section) ?? 0
+        viewModel.numberOfItemsInSection(section)
     }
     
     func collectionView(
@@ -238,7 +244,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? DefaultHeaderReusableView {
-            cell.configure(with: viewModel?.category(at: indexPath.section).name ?? "")
+            cell.configure(with: viewModel.category(at: indexPath.section).name)
         }
         
         return cell
@@ -250,8 +256,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             for: indexPath
         )
         
-        if let cell = cell as? TrackerCollectionViewCell,
-           let viewModel {
+        if let cell = cell as? TrackerCollectionViewCell {
             let tracker = viewModel.tracker(at: indexPath)
             
             cell.setupCell(
@@ -280,7 +285,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                     
                 },
                 UIAction(title: "Редактировать") { [weak self] _ in
-                    guard let self, let viewModel else { return }
+                    guard let self else { return }
                     
                     presentTrackerFormViewController(
                         with: viewModel.tracker(at: indexPath),
@@ -353,10 +358,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCellComplete(cell: TrackerCollectionViewCell) {
-        guard 
-            let viewModel,
-            let indexPath = trackersCollectionView.indexPath(for: cell)
-        else { return }
+        guard let indexPath = trackersCollectionView.indexPath(for: cell) else { return }
         
         viewModel.completeTracker(at: indexPath)
     }
@@ -369,7 +371,7 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         tracker: Tracker
     ) {
         viewController.dismiss(animated: true) { [weak self] in
-            self?.viewModel?.addTrackerToCategory(trackerCategory, tracker: tracker)
+            self?.viewModel.addTrackerToCategory(trackerCategory, tracker: tracker)
         }
     }
 }

@@ -44,7 +44,7 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
         }
     }
     
-    private weak var delegate: CategoriesDataStoreDelegate?
+    weak var delegate: CategoriesDataStoreDelegate?
     
     var isEmptyCateogries: Bool {
         categoriesFetchedResultsController.sections?.isEmpty ?? true
@@ -71,10 +71,6 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
         super.init()
         
         categoriesFetchedResultsController.delegate = self
-    }
-    
-    func setDelegate(_ delegate: any CategoriesDataStoreDelegate) {
-        self.delegate = delegate
     }
     
     func category(at index: Int) -> TrackerCategory {
@@ -141,5 +137,11 @@ extension CategoriesDataStore: NSFetchedResultsControllerDelegate {
         _ controller: NSFetchedResultsController<NSFetchRequestResult>
     ) {
         delegate?.didUpdate()
+    }
+    
+    func controllerWillChangeContent(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>
+    ) {
+        
     }
 }

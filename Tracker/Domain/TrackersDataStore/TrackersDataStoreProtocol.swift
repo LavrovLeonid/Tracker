@@ -10,8 +10,7 @@ import Foundation
 protocol TrackersDataStoreProtocol: NSObjectProtocol {
     var isEmptyTrackerCateogries: Bool { get }
     var numberOfSections: Int { get }
-    
-    func setDelegate(_ delegate: TrackersDataStoreDelegate)
+    var delegate: TrackersDataStoreDelegate? { get set }
     
     func setCurrentDate(_ date: Date)
     func numberOfItemsInSection(_ section: Int) -> Int

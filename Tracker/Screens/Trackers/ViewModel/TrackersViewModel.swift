@@ -9,7 +9,7 @@ import Foundation
 
 final class TrackersViewModel: TrackersViewModelProtocol {
     // MARK: Model
-    private var trackersDataStore: TrackersDataStoreProtocol
+    private let trackersDataStore: TrackersDataStoreProtocol
     
     // MARK: Bindings
     var onTrackersStateChange: Binding<Bool>?
@@ -23,7 +23,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     init(dataStore: TrackersDataStoreProtocol) {
         trackersDataStore = dataStore
         
-        trackersDataStore.setDelegate(self)
+        trackersDataStore.delegate = self
     }
     
     // MARK: Methods

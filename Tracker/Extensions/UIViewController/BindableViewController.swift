@@ -10,8 +10,7 @@ import UIKit
 protocol BindableViewController where Self: UIViewController {
     associatedtype ViewModel
     
-    var viewModel: ViewModel? { get }
+    var viewModel: ViewModel { get }
     
-    func initialize(viewModel: ViewModel)
     func bind()
 }

@@ -175,16 +175,17 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     }
     
     private func presentCategoriesViewController() {
-        let categoriesViewController = CategoriesViewController()
-        
-        let viewModel = CategoriesViewModel(
+        let categoriesViewModel = CategoriesViewModel(
             categoriesDataStore: CategoriesDataStore(),
             categoriesModel: CategoriesModel(
                 initialSelectedCategory: selectedCategory
             )
         )
         
-        categoriesViewController.initialize(viewModel: viewModel)
+        let categoriesViewController = CategoriesViewController(
+            viewModel: categoriesViewModel
+        )
+        
         categoriesViewController.configure(delegate: self)
         
         present(
@@ -205,11 +206,14 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     }
     
     private func isValidForm() -> Bool {
-        guard !trackerName.isEmpty, trackerName.count <= maxTrackerNameLength else { return false }
-        guard selectedCategory != nil else { return false }
-        guard trackerType != .habit || !selectedWeekDays.isEmpty else { return false }
-        guard selectedEmoji != nil else { return false }
-        guard selectedColor != nil else { return false }
+        guard 
+            !trackerName.isEmpty, 
+            trackerName.count <= maxTrackerNameLength,
+            selectedCategory != nil,
+            trackerType != .habit || !selectedWeekDays.isEmpty,
+            selectedEmoji != nil,
+            selectedColor != nil
+        else { return false }
         
         return true
     }

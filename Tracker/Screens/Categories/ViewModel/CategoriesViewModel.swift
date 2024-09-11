@@ -9,15 +9,15 @@ import Foundation
 
 final class CategoriesViewModel: CategoriesViewModelProtocol {
     // MARK: Models
-    private var categoriesDataStore: CategoriesDataStoreProtocol
-    private var categoriesModel: CategoriesModelProtocol
+    private let categoriesDataStore: CategoriesDataStoreProtocol
+    private let categoriesModel: CategoriesModelProtocol
     
     // MARK: Bindings
     var onTrackerCategoriesStateChange: Binding<Bool>?
     var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>?
     
     // MARK: Properties
-    var catgoriesCount: Int {
+    var categoriesCount: Int {
         categoriesDataStore.categoriesCount
     }
     
@@ -29,7 +29,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         self.categoriesDataStore = categoriesDataStore
         self.categoriesModel = categoriesModel
         
-        categoriesDataStore.setDelegate(self)
+        categoriesDataStore.delegate = self
     }
     
     // MARK: Methods

@@ -52,13 +52,12 @@ final class OnboardingViewController: UIPageViewController, PresentingViewContro
     }()
     
     weak var onboardingDelegate: OnboardingViewControllerDelegate?
-    var test: String?
     
     override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setupView()
         setupSubviews()
         setupConstraints()

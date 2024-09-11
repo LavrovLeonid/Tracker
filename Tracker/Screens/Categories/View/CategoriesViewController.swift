@@ -59,16 +59,10 @@ final class CategoriesViewController:
     
     // MARK: BindableViewController
     typealias ViewModel = CategoriesViewModelProtocol
-    var viewModel: ViewModel?
-    
-    func initialize(viewModel: ViewModel) {
-        self.viewModel = viewModel
-        
-        bind()
-    }
+    var viewModel: ViewModel
     
     func bind() {
-        viewModel?.onTrackerCategoriesStateChange = { [weak self] isEmptyTrackerCateogries in
+        viewModel.onTrackerCategoriesStateChange = { [weak self] isEmptyTrackerCateogries in
             guard let self else { return }
             
             if isEmptyTrackerCateogries {
@@ -79,7 +73,7 @@ final class CategoriesViewController:
             }
         }
         
-        viewModel?.onSelectedTrackerCategoryStateChange = { [weak self] category in
+        viewModel.onSelectedTrackerCategoryStateChange = { [weak self] category in
             guard let self else { return }
             
             if let category {
@@ -91,6 +85,18 @@ final class CategoriesViewController:
     }
     
     // MARK: Life cicle
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        bind()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -98,7 +104,7 @@ final class CategoriesViewController:
         setupSubviews()
         setupConstraints()
         
-        viewModel?.viewDidLoad()
+        viewModel.viewDidLoad()
     }
     
     // MARK: PresentingViewController
@@ -168,16 +174,17 @@ final class CategoriesViewController:
     }
     
     private func presentCategoryForm(with category: TrackerCategory? = nil) {
-        let categoryFormViewController = CategoryFormViewController()
-        
-        let viewModel = CategoryFormViewModel(
+        let categoryFormViewModel = CategoryFormViewModel(
             categoriesDataStore: CategoriesDataStore(),
             categoryFormModel: CategoryFormModel(
                 initialCategory: category
             )
         )
         
-        categoryFormViewController.initialize(viewModel: viewModel)
+        let categoryFormViewController = CategoryFormViewController(
+            viewModel: categoryFormViewModel
+        )
+        
         categoryFormViewController.configure(delegate: self)
         
         navigationController?.pushViewController(
@@ -194,8 +201,8 @@ final class CategoriesViewController:
         )
         
         alertController.addAction(
-            UIAlertAction(title: "Удалить", style: .destructive) { _ in
-                self.viewModel?.deleteCategory(at: indexPath)
+            UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+                self?.viewModel.deleteCategory(at: indexPath)
             }
         )
         alertController.addAction(
@@ -215,7 +222,7 @@ extension CategoriesViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        viewModel?.catgoriesCount ?? 0
+        viewModel.categoriesCount
     }
     
     func collectionView(
@@ -227,11 +234,11 @@ extension CategoriesViewController: UICollectionViewDataSource {
             for: indexPath
         )
         
-        if let viewModel, let cell = cell as? ListItemCollectionViewCell {
+        if let cell = cell as? ListItemCollectionViewCell {
             cell.configure(
                 placement: .getPlacement(
                     at: indexPath.item,
-                    in: viewModel.catgoriesCount
+                    in: viewModel.categoriesCount
                 )
             )
             cell.configure(title: viewModel.category(at: indexPath).name)
@@ -289,7 +296,7 @@ extension CategoriesViewController: UICollectionViewDelegateFlowLayout {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        viewModel?.selectCategory(at: indexPath)
+        viewModel.selectCategory(at: indexPath)
     }
     
     func collectionView(
@@ -302,7 +309,7 @@ extension CategoriesViewController: UICollectionViewDelegateFlowLayout {
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
                 UIAction(title: "Редактировать") { [weak self] _ in
-                    guard let self, let viewModel else { return }
+                    guard let self else { return }
                     
                     presentCategoryForm(with: viewModel.category(at: indexPath))
                 },

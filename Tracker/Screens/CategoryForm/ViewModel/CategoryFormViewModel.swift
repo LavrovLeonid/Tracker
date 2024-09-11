@@ -36,7 +36,7 @@ final class CategoryFormViewModel: CategoryFormViewModelProtocol {
         onEnableSubmitButtonStateChange?(validateCategoryName(categoryFormModel.categoryName))
     }
     
-    func submit() {
+    func submitButtonTapped() {
         var trackerCategory: TrackerCategory
         
         if let initialCategory = categoryFormModel.initialCategory {
@@ -61,8 +61,10 @@ final class CategoryFormViewModel: CategoryFormViewModelProtocol {
     }
     
     private func validateCategoryName(_ name: String) -> Bool {
-        guard !name.isEmpty else { return false }
-        guard !categoriesDataStore.hasCategory(with: name) else { return false }
+        guard 
+            !name.isEmpty,
+            !categoriesDataStore.hasCategory(with: name)
+        else { return false }
         
         return true
     }

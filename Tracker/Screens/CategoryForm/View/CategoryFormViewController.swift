@@ -39,28 +39,22 @@ final class CategoryFormViewController:
     
     // MARK: BindableViewController
     typealias ViewModel = CategoryFormViewModelProtocol
-    var viewModel: ViewModel?
-    
-    func initialize(viewModel: ViewModel) {
-        self.viewModel = viewModel
-        
-        bind()
-    }
+    var viewModel: ViewModel
     
     func bind() {
-        viewModel?.onEnableSubmitButtonStateChange = { [weak self] isEnabledCreateCategory in
+        viewModel.onEnableSubmitButtonStateChange = { [weak self] isEnabledCreateCategory in
             self?.setEnabledSubmitButton(isEnabledCreateCategory)
         }
         
-        viewModel?.onIsNewCategoryStateChange = { [weak self] isNewCategory in
+        viewModel.onIsNewCategoryStateChange = { [weak self] isNewCategory in
             self?.setTitle(isNewCategory)
         }
         
-        viewModel?.onInitialCategoryNameStateChange = { [weak self] categoryName in
+        viewModel.onInitialCategoryNameStateChange = { [weak self] categoryName in
             self?.categoryNameTextField.text = categoryName
         }
         
-        viewModel?.onCategorySubmit = { [weak self] category in
+        viewModel.onCategorySubmit = { [weak self] category in
             guard let self, let delegate else { return }
             
             delegate.submitCategory(self, category: category)
@@ -75,6 +69,18 @@ final class CategoryFormViewController:
     }
     
     // MARK: Life cicle
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        bind()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -82,7 +88,7 @@ final class CategoryFormViewController:
         setupSubviews()
         setupConstraints()
         
-        viewModel?.viewDidLoad()
+        viewModel.viewDidLoad()
     }
     
     // MARK: PresentingViewController
@@ -134,11 +140,11 @@ final class CategoryFormViewController:
     }
     
     @IBAction private func categoryNameChange(_ sender: TextField) {
-        viewModel?.changeCategoryName(sender.text ?? "")
+        viewModel.changeCategoryName(sender.text ?? "")
     }
     
     @IBAction private func submitButtonTapped() {
-        viewModel?.submit()
+        viewModel.submitButtonTapped()
     }
 }
 

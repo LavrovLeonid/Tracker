@@ -13,7 +13,7 @@ protocol CategoriesViewModelProtocol {
     var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>? { get set }
     
     // MARK: Properties
-    var catgoriesCount: Int { get }
+    var categoriesCount: Int { get }
     
     // MARK: Methods
     func viewDidLoad()
