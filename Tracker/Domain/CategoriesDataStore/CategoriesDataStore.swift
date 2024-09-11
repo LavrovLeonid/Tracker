@@ -34,20 +34,6 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
         return controller
     }()
     
-    private var categories: [TrackerCategory] {
-        guard
-            let objects = self.categoriesFetchedResultsController.fetchedObjects
-        else { return [] }
-        
-        return objects.compactMap { category in
-            TrackerCategory(
-                id: category.id ?? UUID(),
-                name: category.name ?? "",
-                trackers: []
-            )
-        }
-    }
-    
     weak var delegate: CategoriesDataStoreDelegate?
     
     var isEmptyCategories: Bool {
@@ -78,7 +64,9 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
     }
     
     func category(at index: Int) -> TrackerCategory {
-        categories[index]
+        format(categoriesFetchedResultsController.object(
+            at: IndexPath(item: index, section: 0)
+        ))
     }
     
     func addCategory(_ category: TrackerCategory) {
@@ -111,7 +99,16 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
     }
     
     func hasCategory(with name: String) -> Bool {
-        categories.contains { $0.name == name }
+        let fetchRequest = TrackerCategoryEntity.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(
+            format: "SOME name == %@",
+            name as CVarArg
+        )
+        
+        guard let categories = try? context.fetch(fetchRequest) else { return false }
+        
+        return !categories.isEmpty
     }
     
     private func fetchTrackerCategoryEntity(
@@ -133,6 +130,14 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
         } catch {
             print("Ошибка сохранения данных: ", error.localizedDescription)
         }
+    }
+    
+    private func format(_ trackerCategoryEntity: TrackerCategoryEntity) -> TrackerCategory {
+        TrackerCategory(
+            id: trackerCategoryEntity.id ?? UUID(),
+            name: trackerCategoryEntity.name ?? "",
+            trackers: []
+        )
     }
 }
 
@@ -169,8 +174,6 @@ extension CategoriesDataStore: NSFetchedResultsControllerDelegate {
                 if let indexPath {
                     deletedIndexes.insert(indexPath.item)
                 }
-            case .move:
-                break
             case .update:
                 if let indexPath {
                     updatedIndexes.insert(indexPath.item)
