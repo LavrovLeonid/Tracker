@@ -7,11 +7,12 @@
 
 import Foundation
 
-struct TrackerCategory: Equatable {
+struct TrackerCategory: Identifiable, Equatable {
+    let id: TrackerCategoryId
     let name: String
     let trackers: [Tracker]
     
     static func == (lhs: TrackerCategory, rhs: TrackerCategory) -> Bool {
-        lhs.name == rhs.name
+        lhs.id == rhs.id
     }
 }

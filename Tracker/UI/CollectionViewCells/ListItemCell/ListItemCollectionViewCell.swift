@@ -45,11 +45,11 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
         
         return label
     }()
-    private let arrowImageView: UIImageView = {
+    private let endAdormentImageView: UIImageView = {
         let imageView = UIImageView()
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = .arrowRight
+        imageView.contentMode = .scaleAspectFit
         
         return imageView
     }()
@@ -77,7 +77,7 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
         super.prepareForReuse()
         
         switchControl.isHidden = true
-        arrowImageView.isHidden = true
+        endAdormentImageView.isHidden = true
         dividerView.isHidden = false
         titleLabel.text = ""
         descriptionLabel.text = ""
@@ -95,7 +95,11 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(title: String, description: String? = nil, delegate: ListItemCollectionCellDelegate? = nil) {
+    func configure(
+        title: String,
+        description: String? = nil,
+        delegate: ListItemCollectionCellDelegate? = nil
+    ) {
         self.delegate = delegate
         
         titleLabel.text = title
@@ -122,11 +126,18 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
     
     func configure(endAdorment: ListItemCollectionCellEndAdorment) {
         switch endAdorment {
+            case .none:
+                endAdormentImageView.isHidden = true
+                switchControl.isHidden = true
             case .arrow:
-                arrowImageView.isHidden = false
+                endAdormentImageView.isHidden = false
+                endAdormentImageView.image = .arrowRight
             case .toggle(let isOn):
                 switchControl.isHidden = false
                 switchControl.isOn = isOn
+            case .check:
+                endAdormentImageView.isHidden = false
+                endAdormentImageView.image = .checkIcon
         }
     }
     
@@ -134,7 +145,7 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
         layer.masksToBounds = true
         contentView.backgroundColor = .trackerBackground
         
-        arrowImageView.isHidden = true
+        endAdormentImageView.isHidden = true
         switchControl.isHidden = true
         
         innerStackView.addArrangedSubview(titleLabel)
@@ -143,7 +154,7 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
         stackView.addArrangedSubview(innerStackView)
         
         stackView.addArrangedSubview(switchControl)
-        stackView.addArrangedSubview(arrowImageView)
+        stackView.addArrangedSubview(endAdormentImageView)
         
         contentView.addSubview(stackView)
         contentView.addSubview(dividerView)
@@ -154,8 +165,8 @@ final class ListItemCollectionViewCell: UICollectionViewCell, ReusableView {
             stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
             stackView.bottomAnchor.constraint(equalTo: dividerView.topAnchor, constant: -14),
             
-            arrowImageView.heightAnchor.constraint(equalToConstant: 24),
-            arrowImageView.widthAnchor.constraint(equalToConstant: 24),
+            endAdormentImageView.heightAnchor.constraint(equalToConstant: 24),
+            endAdormentImageView.widthAnchor.constraint(equalToConstant: 24),
             
             dividerView.heightAnchor.constraint(equalToConstant: 0.5),
             dividerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
