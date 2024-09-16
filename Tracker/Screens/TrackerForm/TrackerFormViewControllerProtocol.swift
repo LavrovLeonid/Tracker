@@ -11,6 +11,7 @@ protocol TrackerFormViewControllerProtocol: UIViewController {
     func configure(trackerType: TrackerType, delegate: TrackerFormViewControllerDelegate?)
     func configure(
         with tracker: Tracker,
+        completeCount: Int,
         at category: TrackerCategory,
         delegate: TrackerFormViewControllerDelegate?
     )

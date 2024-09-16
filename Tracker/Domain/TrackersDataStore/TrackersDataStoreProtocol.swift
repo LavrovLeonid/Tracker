@@ -8,21 +8,24 @@
 import Foundation
 
 protocol TrackersDataStoreProtocol: NSObjectProtocol {
-    var isEmptyTrackerCateogries: Bool { get }
+    var isEmptyTrackerCategories: Bool { get }
     var numberOfSections: Int { get }
     var delegate: TrackersDataStoreDelegate? { get set }
     
     func setCurrentDate(_ date: Date)
+    func setSearchText(_ searchText: String)
     func numberOfItemsInSection(_ section: Int) -> Int
-    func category(at index: Int) -> TrackerCategory
+    func category(at indexPath: IndexPath) -> TrackerCategory
+    func originCategory(at indexPath: IndexPath) -> TrackerCategory
     func tracker(at indexPath: IndexPath) -> Tracker
-    func countTrackerRecords(for tracker: Tracker) -> Int
-    func isSelectedTracker(at tracker: Tracker) -> Bool
-    func addCategory(_ category: TrackerCategory)
-    func removeCategory(_ category: TrackerCategory)
-    func editCategory(_ category: TrackerCategory)
-    func addTrackerToCategory(_ trackerCategory: TrackerCategory, tracker: Tracker)
+    func countTrackerRecords(at indexPath: IndexPath) -> Int
+    func isPinnedTracker(at indexPath: IndexPath) -> Bool
+    func isCompletedTracker(at indexPath: IndexPath) -> Bool
+    func addTracker(_ tracker: Tracker, to category: TrackerCategory)
+    func editTracker(_ tracker: Tracker, at category: TrackerCategory)
     func completeTracker(at indexPath: IndexPath)
+    func uncompleteTracker(at indexPath: IndexPath)
     func removeTracker(at indexPath: IndexPath)
-    func hasCategory(with name: String) -> Bool
+    func pinTracker(at indexPath: IndexPath)
+    func unpinTracker(at indexPath: IndexPath)
 }

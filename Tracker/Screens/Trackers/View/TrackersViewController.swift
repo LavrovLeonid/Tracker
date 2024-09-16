@@ -41,6 +41,15 @@ final class TrackersViewController:
         
         return emptyView
     }()
+    private let notFoundView: EmptyView = {
+        let emptyView = EmptyView()
+        
+        emptyView.isHidden = true
+        emptyView.translatesAutoresizingMaskIntoConstraints = false
+        emptyView.configure(image: .notFoundTrackers, text: "Ничего не найдено")
+        
+        return emptyView
+    }()
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         
@@ -66,14 +75,47 @@ final class TrackersViewController:
     private(set) var viewModel: ViewModel
     
     func bind() {
-        viewModel.onTrackersStateChange = { [weak self] isEmptyTrackerCateogries in
+        viewModel.onTrackersPresentEmptyView = { [weak self] in
             guard let self else { return }
             
-            if isEmptyTrackerCateogries {
-                presentEmptyView()
-            } else {
-                presentTrackersCollectionView()
-                trackersCollectionView.reloadData()
+            presentEmptyView()
+        }
+        
+        viewModel.onTrackersPresentNotFoundView = { [weak self] in
+            guard let self else { return }
+            
+            presentNotFoundView()
+        }
+        
+        viewModel.onTrackersPresentCollectionView = { [weak self] in
+            guard let self else { return }
+            
+            presentTrackersCollectionView()
+        }
+        
+        viewModel.onTrackersReloadCollectionView = { [weak self] in
+            guard let self else { return }
+            
+            trackersCollectionView.reloadData()
+        }
+        
+        viewModel.onTrackersStateChange = { [weak self] updates in
+            guard let self else { return }
+            
+            trackersCollectionView.performBatchUpdates({
+                self.trackersCollectionView.insertSections(updates.insertedSectionsIndexes)
+                self.trackersCollectionView.reloadSections(updates.updatedSectionsIndexes)
+                self.trackersCollectionView.deleteSections(updates.deletedSectionsIndexes)
+                
+                self.trackersCollectionView.insertItems(at: updates.insertedItemsIndexPaths)
+                self.trackersCollectionView.reloadItems(at: updates.updatedItemsIndexPaths)
+                self.trackersCollectionView.deleteItems(at: updates.deletedItemsIndexPaths)
+                
+                updates.movedItemsIndexPaths.forEach { indexPath, newIndexPath in
+                    self.trackersCollectionView.moveItem(at: indexPath, to: newIndexPath)
+                }
+            }) { _ in
+                self.viewModel.didFinishUpdates()
             }
         }
     }
@@ -115,9 +157,15 @@ final class TrackersViewController:
         
         navigationItem.leftBarButtonItem = leftBarButtonItem
         
-        let searchController = UISearchController()
+        let searchController = UISearchController(searchResultsController: nil)
+        
         searchController.searchBar.placeholder = "Поиск"
         searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.searchTextField.addTarget(
+            self,
+            action: #selector(searchTextFieldEditingChanged(_:)),
+            for: .editingChanged
+        )
         searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
         
         navigationItem.searchController = searchController
@@ -131,6 +179,7 @@ final class TrackersViewController:
     
     func setupSubviews() {
         view.addSubview(emptyView)
+        view.addSubview(notFoundView)
         view.addSubview(trackersCollectionView)
     }
     
@@ -143,6 +192,16 @@ final class TrackersViewController:
                 equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16
             ),
             emptyView.trailingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16
+            ),
+            
+            notFoundView.centerYAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.centerYAnchor
+            ),
+            notFoundView.leadingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16
+            ),
+            notFoundView.trailingAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16
             ),
             
@@ -159,13 +218,19 @@ final class TrackersViewController:
     private func presentEmptyView() {
         trackersCollectionView.isHidden = true
         emptyView.isHidden = false
+        notFoundView.isHidden = true
     }
     
     private func presentTrackersCollectionView() {
         trackersCollectionView.isHidden = false
         emptyView.isHidden = true
-        
-        trackersCollectionView.reloadData()
+        notFoundView.isHidden = true
+    }
+    
+    private func presentNotFoundView() {
+        trackersCollectionView.isHidden = true
+        emptyView.isHidden = true
+        notFoundView.isHidden = false
     }
     
     private func presentCreateTrackerCategoryViewController() {
@@ -179,11 +244,15 @@ final class TrackersViewController:
         )
     }
     
-    private func presentTrackerFormViewController(
-        with tracker: Tracker,
-        at category: TrackerCategory
-    ) {
+    private func presentTrackerFormViewController(at indexPath: IndexPath) {
         let trackerFormViewController = TrackerFormViewController()
+        
+        trackerFormViewController.configure(
+            with: viewModel.tracker(at: indexPath),
+            completeCount: viewModel.countTrackerRecords(at: indexPath),
+            at: viewModel.originCategory(at: indexPath),
+            delegate: self
+        )
         
         present(
             UINavigationController(rootViewController: trackerFormViewController),
@@ -201,6 +270,7 @@ final class TrackersViewController:
         alertController.addAction(
             UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
                 self?.viewModel.removeTracker(at: indexPath)
+                self?.trackersCollectionView.reloadData()
             }
         )
         alertController.addAction(
@@ -217,6 +287,10 @@ final class TrackersViewController:
     
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
         viewModel.setCurrentDate(sender.date)
+    }
+    
+    @IBAction func searchTextFieldEditingChanged(_ searchField: UISearchTextField) {
+        viewModel.setSearchText(searchField.text ?? "")
     }
 }
 
@@ -257,12 +331,10 @@ extension TrackersViewController: UICollectionViewDataSource {
         )
         
         if let cell = cell as? TrackerCollectionViewCell {
-            let tracker = viewModel.tracker(at: indexPath)
-            
             cell.setupCell(
-                with: tracker,
-                quantity: viewModel.countTrackerRecords(for: tracker),
-                isSelected: viewModel.isSelectedTracker(at: tracker),
+                with: viewModel.tracker(at: indexPath),
+                quantity: viewModel.countTrackerRecords(at: indexPath),
+                isSelected: viewModel.isCompletedTracker(at: indexPath),
                 delegate: self
             )
         }
@@ -279,21 +351,24 @@ extension TrackersViewController: UICollectionViewDelegate {
     ) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
         
+        let isPinned = viewModel.isPinnedTracker(at: indexPath)
+        
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
-                UIAction(title: "Закрепить") { _ in
+                UIAction(title: isPinned ? "Открепить" : "Закрепить") { [weak self] _ in
+                    guard let self else { return }
                     
+                    viewModel.pinTrackerTapped(at: indexPath)
                 },
                 UIAction(title: "Редактировать") { [weak self] _ in
                     guard let self else { return }
                     
-                    presentTrackerFormViewController(
-                        with: viewModel.tracker(at: indexPath),
-                        at: viewModel.category(at: indexPath.section)
-                    )
+                    presentTrackerFormViewController(at: indexPath)
                 },
                 UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
-                    self?.presentAlertToRemoveTracker(at: indexPath)
+                    guard let self else { return }
+                    
+                    presentAlertToRemoveTracker(at: indexPath)
                 }
             ])
         })
@@ -325,7 +400,12 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         insetForSectionAt section: Int
     ) -> UIEdgeInsets {
-        UIEdgeInsets(top: 12, left: geometricParams.leftInset, bottom: 16, right: geometricParams.rightInset)
+        UIEdgeInsets(
+            top: 12,
+            left: geometricParams.leftInset,
+            bottom: 16,
+            right: geometricParams.rightInset
+        )
     }
     
     func collectionView(
@@ -360,7 +440,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCellComplete(cell: TrackerCollectionViewCell) {
         guard let indexPath = trackersCollectionView.indexPath(for: cell) else { return }
         
-        viewModel.completeTracker(at: indexPath)
+        viewModel.completeTrackerTapped(at: indexPath)
     }
 }
 
@@ -371,7 +451,27 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         tracker: Tracker
     ) {
         viewController.dismiss(animated: true) { [weak self] in
-            self?.viewModel.addTrackerToCategory(trackerCategory, tracker: tracker)
+            guard let self else { return }
+            
+            viewModel.addTracker(tracker, to: trackerCategory)
+        }
+    }
+}
+
+extension TrackersViewController: TrackerFormViewControllerDelegate {
+    func trackerFormCancel(_ viewController: TrackerFormViewControllerProtocol) {
+        viewController.dismiss(animated: true)
+    }
+    
+    func trackerFormSubmit(
+        _ viewController: TrackerFormViewControllerProtocol,
+        trackerCategory: TrackerCategory,
+        tracker: Tracker
+    ) {
+        viewController.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            
+            viewModel.editTracker(tracker, at: trackerCategory)
         }
     }
 }

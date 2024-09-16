@@ -62,40 +62,43 @@ final class CategoriesViewController:
     var viewModel: ViewModel
     
     func bind() {
-        viewModel.onTrackerCategoriesEmptyStateChange = { [weak self] isEmptyTrackerCategories in
+        viewModel.onCategoriesPresentEmptyView = { [weak self] in
             guard let self else { return }
             
-            if isEmptyTrackerCategories {
-                presentEmptyView()
-            } else {
-                presentCategoriesCollectionView()
-                categoriesCollectionView.reloadData()
+            presentEmptyView()
+        }
+        
+        viewModel.onCategoriesPresentCollectionView = { [weak self] in
+            guard let self else { return }
+            
+            presentCategoriesCollectionView()
+        }
+        
+        viewModel.onCategoriesReloadCollectionView = { [weak self] in
+            guard let self else { return }
+            
+            categoriesCollectionView.reloadData()
+        }
+        
+        viewModel.onCategoriesStateChange = { [weak self] updates in
+            guard let self else { return }
+            
+            categoriesCollectionView.performBatchUpdates({
+                self.categoriesCollectionView.insertItems(at: updates.insertedItemsIndexPaths)
+                self.categoriesCollectionView.reloadItems(at: updates.updatedItemsIndexPaths)
+                self.categoriesCollectionView.deleteItems(at: updates.deletedItemsIndexPaths)
+            }) { _ in
+                self.viewModel.didFinishUpdates()
             }
         }
         
-        viewModel.onSelectedTrackerCategoryStateChange = { [weak self] category in
+        viewModel.onSelectedCategoryStateChange = { [weak self] category in
             guard let self, let delegate else { return }
             
             if let category {
                 delegate.selectCategory(self, category: category)
             } else {
                 delegate.resetCategory(self)
-            }
-        }
-        
-        viewModel.onTrackerCategoriesStateChange = { [weak self] updates in
-            guard let self else { return }
-            
-            categoriesCollectionView.performBatchUpdates {
-                self.categoriesCollectionView.insertItems(
-                    at: updates.insertedIndexes.map { IndexPath(item: $0, section: 0) }
-                )
-                self.categoriesCollectionView.reloadItems(
-                    at: updates.updatedIndexes.map { IndexPath(item: $0, section: 0) }
-                )
-                self.categoriesCollectionView.deleteItems(
-                    at: updates.deletedIndexes.map { IndexPath(item: $0, section: 0) }
-                )
             }
         }
     }
@@ -191,7 +194,7 @@ final class CategoriesViewController:
     
     private func presentCategoryForm(with category: TrackerCategory? = nil) {
         let categoryFormViewModel = CategoryFormViewModel(
-            categoriesDataStore: CategoriesDataStore(),
+            categoriesDataStore: CategoriesDataStore.shared,
             categoryFormModel: CategoryFormModel(
                 initialCategory: category
             )
@@ -218,7 +221,9 @@ final class CategoriesViewController:
         
         alertController.addAction(
             UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
-                self?.viewModel.deleteCategory(at: indexPath)
+                guard let self else { return }
+                
+                viewModel.deleteCategory(at: indexPath)
             }
         )
         alertController.addAction(
@@ -330,7 +335,9 @@ extension CategoriesViewController: UICollectionViewDelegateFlowLayout {
                     presentCategoryForm(with: viewModel.category(at: indexPath))
                 },
                 UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
-                    self?.presentAlertToRemoveCategory(at: indexPath)
+                    guard let self else { return }
+                    
+                    presentAlertToRemoveCategory(at: indexPath)
                 }
             ])
         })
