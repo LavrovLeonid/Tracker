@@ -116,7 +116,11 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func didFinishUpdates() {
         if trackersDataStore.isEmptyTrackerCategories {
-            onTrackersPresentEmptyView?()
+            if trackersDataStore.searchText.isEmpty {
+                onTrackersPresentEmptyView?()
+            } else {
+                onTrackersPresentNotFoundView?()
+            }
         }
     }
     

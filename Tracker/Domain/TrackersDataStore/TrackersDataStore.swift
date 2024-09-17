@@ -15,7 +15,7 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
     
     let dataStoreUpdates = DataStoreUpdates()
     
-    private var searchText = ""
+    private(set) var searchText = ""
     private var currentDate = Date()
     private var currentWeekday: WeekDay {
         WeekDay(

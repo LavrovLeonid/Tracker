@@ -12,7 +12,6 @@ final class PersistentContainer {
     static let shared = PersistentContainer()
     private init() {}
     
-    
     // MARK: Properties
     private let persistentContainerName = "TrackerModel"
     

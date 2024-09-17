@@ -9,6 +9,7 @@ import Foundation
 
 protocol TrackersDataStoreProtocol: NSObjectProtocol {
     var isEmptyTrackerCategories: Bool { get }
+    var searchText: String { get }
     var numberOfSections: Int { get }
     var delegate: TrackersDataStoreDelegate? { get set }
     
