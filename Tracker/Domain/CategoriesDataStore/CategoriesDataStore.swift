@@ -18,7 +18,7 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
     @Multicast var delegate: CategoriesDataStoreDelegate
     
     private var context = PersistentContainer.shared.context
-    private let pinCategoryName = "Закрепленные"
+    private let pinCategoryName = NSLocalizedString("categoriesPinCategory", comment: "Pin category")
     private let dataStoreUpdates = DataStoreUpdates()
     
     private(set) lazy var pinCategory: TrackerCategoryEntity = {

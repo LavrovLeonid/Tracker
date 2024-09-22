@@ -306,20 +306,26 @@ final class TrackersViewController:
     
     private func presentAlertToRemoveTracker(at indexPath: IndexPath) {
         let alertController = UIAlertController(
-            title: "Уверены что хотите удалить трекер?",
+            title: NSLocalizedString("trackersConfirmDelete", comment: "Confirm delete tracker"),
             message: nil,
             preferredStyle: .actionSheet
         )
         
         alertController.addAction(
-            UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+            UIAlertAction(
+                title: NSLocalizedString(
+                    "trackersDelete",
+                    comment: "Delete tracker"
+                ),
+                style: .destructive
+            ) { [weak self] _ in
                 guard let self else { return }
                 
                 viewModel.removeTracker(at: indexPath)
             }
         )
         alertController.addAction(
-            UIAlertAction(title: "Отменить", style: .cancel)
+            UIAlertAction(title: NSLocalizedString("trackersCancel", comment: "Cancel delete tracker"), style: .cancel)
         )
         
         present(alertController, animated: true)
@@ -418,17 +424,30 @@ extension TrackersViewController: UICollectionViewDelegate {
         
         return UIContextMenuConfiguration(actionProvider: { _ in
             UIMenu(children: [
-                UIAction(title: isPinned ? "Открепить" : "Закрепить") { [weak self] _ in
+                UIAction(
+                    title: isPinned ? NSLocalizedString(
+                        "trackersUnpin",
+                        comment: "Unpin tracker"
+                    ) : NSLocalizedString(
+                        "trackersPin",
+                        comment: "Pin tracker")
+                ) { [weak self] _ in
                     guard let self else { return }
                     
                     viewModel.pinTrackerTapped(at: indexPath)
                 },
-                UIAction(title: "Редактировать") { [weak self] _ in
+                UIAction(title: NSLocalizedString("trackersEdit", comment: "Edit tracker")) { [weak self] _ in
                     guard let self else { return }
                     
                     presentTrackerFormViewController(at: indexPath)
                 },
-                UIAction(title: "Удалить", attributes: [.destructive]) { [weak self] _ in
+                UIAction(
+                    title: NSLocalizedString(
+                        "trackersDelete",
+                        comment: "Delete tracker"
+                    ),
+                    attributes: [.destructive]
+                ) { [weak self] _ in
                     guard let self else { return }
                     
                     presentAlertToRemoveTracker(at: indexPath)

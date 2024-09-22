@@ -11,3 +11,10 @@
 "trackersFilters" = "Filters";
 "trackersNotFound" = "Nothing found";
 "trackersTitle" = "Trackers";
+"trackersPin" = "Pin";
+"trackersUnpin" = "Unpin";
+"trackersEdit" = "Edit";
+"trackersDelete" = "Delete";
+"trackersCancel" = "Cancel";
+"trackersConfirmDelete" = "Are you sure you want to delete the tracker?";
+"categoriesPinCategory" = "Pinned";

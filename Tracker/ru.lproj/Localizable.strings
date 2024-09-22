@@ -11,3 +11,10 @@
 "trackersFilters" = "Фильтры";
 "trackersNotFound" = "Ничего не найдено";
 "trackersTitle" = "Трекеры";
+"trackersPin" = "Закрепить";
+"trackersUnpin" = "Открепить";
+"trackersEdit" = "Редактировать";
+"trackersDelete" = "Удалить";
+"trackersCancel" = "Отменить";
+"trackersConfirmDelete" = "Уверены что хотите удалить трекер?";
+"categoriesPinCategory" = "Закрепленные";
