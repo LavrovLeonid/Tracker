@@ -17,10 +17,15 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     var onTrackersPresentNotFoundView: BindingWithoutValue?
     var onTrackersReloadCollectionView: BindingWithoutValue?
     var onTrackersPresentCollectionView: BindingWithoutValue?
+    var onTrackersSetDate: Binding<Date>?
     
     // MARK: Properties
     var numberOfSections: Int {
         trackersDataStore.numberOfSections
+    }
+    
+    var appliedFilter: TrackersFilter {
+        trackersDataStore.appliedFilter
     }
     
     // MARK: Initialization
@@ -45,35 +50,35 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     func setCurrentDate(_ date: Date) {
-        trackersDataStore.setCurrentDate(date)
+        trackersDataStore.setDate(date)
         
-        if trackersDataStore.isEmptyTrackerCategories {
-            onTrackersPresentEmptyView?()
-        } else {
-            onTrackersPresentCollectionView?()
-            onTrackersReloadCollectionView?()
-        }
+        trackersDataStore.fetchTrackers()
+        
+        updateView()
     }
     
     func setSearchText(_ searchText: String) {
         trackersDataStore.setSearchText(searchText)
         
-        if trackersDataStore.isEmptyTrackerCategories {
-            if searchText.isEmpty {
-                onTrackersPresentEmptyView?()
-            } else {
-                onTrackersPresentNotFoundView?()
-            }
-        } else {
-            onTrackersPresentCollectionView?()
-            onTrackersReloadCollectionView?()
+        trackersDataStore.fetchTrackers()
+        
+        updateView()
+    }
+    
+    func setFilter(_ filter: TrackersFilter) {
+        trackersDataStore.setFilter(filter)
+        
+        if case .today = filter {
+            trackersDataStore.resetDate()
         }
+        
+        trackersDataStore.fetchTrackers()
+        
+        updateView()
     }
     
     func addTracker(_ tracker: Tracker, to category: TrackerCategory) {
-        if trackersDataStore.isEmptyTrackerCategories {
-            onTrackersPresentCollectionView?()
-        }
+        trackersDataStore.resetDate()
         
         trackersDataStore.addTracker(tracker, to: category)
     }
@@ -121,6 +126,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             } else {
                 onTrackersPresentNotFoundView?()
             }
+        } else {
+            onTrackersPresentCollectionView?()
         }
     }
     
@@ -133,6 +140,20 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             trackersDataStore.unpinTracker(at: indexPath)
         } else {
             trackersDataStore.pinTracker(at: indexPath)
+        }
+    }
+    
+    private func updateView() {
+        onTrackersReloadCollectionView?()
+        
+        if trackersDataStore.isEmptyTrackerCategories {
+            if trackersDataStore.searchText.isEmpty {
+                onTrackersPresentEmptyView?()
+            } else {
+                onTrackersPresentNotFoundView?()
+            }
+        } else {
+            onTrackersPresentCollectionView?()
         }
     }
 }

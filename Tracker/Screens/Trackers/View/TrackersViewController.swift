@@ -57,9 +57,27 @@ final class TrackersViewController:
         datePicker.preferredDatePickerStyle = .compact
         datePicker.tintColor = .trackerBlue
         datePicker.locale = Calendar.current.locale
+        
+        datePicker.setValue(UIColor.black, forKey: "textColor")
+        datePicker.setValue(false, forKey: "highlightsToday")
+        
+        if let subview = datePicker.subviews.first {
+            datePicker.overrideUserInterfaceStyle = .light
+            subview.backgroundColor = .trackerDatePickerBackground
+            subview.layer.cornerRadius = 8
+        }
+        
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         
         return datePicker
+    }()
+    private lazy var filtersButton: FiltersButton = {
+        let filtersButton = FiltersButton()
+        
+        filtersButton.setTitle("Фильтры", for: .normal)
+        filtersButton.addTarget(self, action: #selector(filtersButtonTapped), for: .touchUpInside)
+        
+        return filtersButton
     }()
     
     // MARK: Helpers
@@ -118,6 +136,12 @@ final class TrackersViewController:
                 self.viewModel.didFinishUpdates()
             }
         }
+        
+        viewModel.onTrackersSetDate = { [weak self] date in
+            guard let self else { return }
+            
+            datePicker.setDate(date, animated: true)
+        }
     }
     
     // MARK: Life cicle
@@ -145,7 +169,7 @@ final class TrackersViewController:
     
     // MARK: PresentingViewController
     func setupView() {
-        navigationItem.title = "Трекеры"
+        title = "Трекеры"
         
         let leftBarButtonItem = UIBarButtonItem(
             image: .plusIcon,
@@ -161,12 +185,12 @@ final class TrackersViewController:
         
         searchController.searchBar.placeholder = "Поиск"
         searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
         searchController.searchBar.searchTextField.addTarget(
             self,
             action: #selector(searchTextFieldEditingChanged(_:)),
             for: .editingChanged
         )
-        searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
         
         navigationItem.searchController = searchController
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
@@ -181,6 +205,7 @@ final class TrackersViewController:
         view.addSubview(emptyView)
         view.addSubview(notFoundView)
         view.addSubview(trackersCollectionView)
+        view.addSubview(filtersButton)
     }
     
     func setupConstraints() {
@@ -210,7 +235,11 @@ final class TrackersViewController:
             trackersCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             trackersCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
-            datePicker.widthAnchor.constraint(equalToConstant: 77)
+            datePicker.widthAnchor.constraint(equalToConstant: 77),
+            
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -219,20 +248,24 @@ final class TrackersViewController:
         trackersCollectionView.isHidden = true
         emptyView.isHidden = false
         notFoundView.isHidden = true
+        filtersButton.isHidden = true
     }
     
     private func presentTrackersCollectionView() {
         trackersCollectionView.isHidden = false
         emptyView.isHidden = true
         notFoundView.isHidden = true
+        filtersButton.isHidden = false
     }
     
     private func presentNotFoundView() {
         trackersCollectionView.isHidden = true
         emptyView.isHidden = true
         notFoundView.isHidden = false
+        filtersButton.isHidden = true
     }
     
+    // MARK: Routing
     private func presentCreateTrackerCategoryViewController() {
         let createTrackerViewController = CreateTrackerViewController()
         
@@ -269,8 +302,9 @@ final class TrackersViewController:
         
         alertController.addAction(
             UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
-                self?.viewModel.removeTracker(at: indexPath)
-                self?.trackersCollectionView.reloadData()
+                guard let self else { return }
+                
+                viewModel.removeTracker(at: indexPath)
             }
         )
         alertController.addAction(
@@ -278,6 +312,20 @@ final class TrackersViewController:
         )
         
         present(alertController, animated: true)
+    }
+    
+    private func presentFiltersViewController() {
+        let trackersFilterViewController = TrackersFilterViewController()
+        
+        trackersFilterViewController.configure(
+            appliedFilter: viewModel.appliedFilter,
+            delegate: self
+        )
+        
+        present(
+            UINavigationController(rootViewController: trackersFilterViewController),
+            animated: true
+        )
     }
     
     // MARK: Actions
@@ -289,8 +337,12 @@ final class TrackersViewController:
         viewModel.setCurrentDate(sender.date)
     }
     
-    @IBAction func searchTextFieldEditingChanged(_ searchField: UISearchTextField) {
+    @IBAction private func searchTextFieldEditingChanged(_ searchField: UISearchTextField) {
         viewModel.setSearchText(searchField.text ?? "")
+    }
+    
+    @IBAction private func filtersButtonTapped() {
+        presentFiltersViewController()
     }
 }
 
@@ -472,6 +524,19 @@ extension TrackersViewController: TrackerFormViewControllerDelegate {
             guard let self else { return }
             
             viewModel.editTracker(tracker, at: trackerCategory)
+        }
+    }
+}
+
+extension TrackersViewController: TrackersFilterViewControllerDelegate {
+    func applyFilter(
+        _ viewController: TrackersFilterViewControllerProtocol,
+        filter: TrackersFilter
+    ) {
+        viewController.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            
+            viewModel.setFilter(filter)
         }
     }
 }

@@ -11,10 +11,10 @@
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
-        <attribute name="schedules" attributeType="String"/>
+        <attribute name="schedules" optional="YES" attributeType="String"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" customClassName="TrackerType"/>
         <relationship name="originCategory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryEntity"/>
-        <relationship name="records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TrackerRecordEntity" inverseName="tracker" inverseEntity="TrackerRecordEntity"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TrackerRecordEntity" inverseName="tracker" inverseEntity="TrackerRecordEntity"/>
         <relationship name="sectionCategory" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryEntity" inverseName="trackers" inverseEntity="TrackerCategoryEntity"/>
     </entity>
     <entity name="TrackerRecordEntity" representedClassName="TrackerRecordEntity" syncable="YES" codeGenerationType="class">

@@ -14,9 +14,11 @@ protocol TrackersViewModelProtocol {
     var onTrackersPresentNotFoundView: BindingWithoutValue? { get set }
     var onTrackersPresentCollectionView: BindingWithoutValue? { get set }
     var onTrackersReloadCollectionView: BindingWithoutValue? { get set }
+    var onTrackersSetDate: Binding<Date>? { get set }
     
     // MARK: Properties
     var numberOfSections: Int { get }
+    var appliedFilter: TrackersFilter { get }
     
     // MARK: Methods
     func viewDidLoad()
@@ -29,6 +31,7 @@ protocol TrackersViewModelProtocol {
     func isPinnedTracker(at indexPath: IndexPath) -> Bool
     func setCurrentDate(_ date: Date)
     func setSearchText(_ searchText: String)
+    func setFilter(_ filter: TrackersFilter)
     func addTracker(_ tracker: Tracker, to category: TrackerCategory)
     func editTracker(_ tracker: Tracker, at category: TrackerCategory)
     func removeTracker(at indexPath: IndexPath)

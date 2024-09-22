@@ -23,9 +23,5 @@ class BaseButton: UIButton {
         layer.masksToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
         titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        
-        NSLayoutConstraint.activate([
-            heightAnchor.constraint(equalToConstant: 60)
-        ])
     }
 }

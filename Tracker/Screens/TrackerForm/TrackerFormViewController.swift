@@ -11,6 +11,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     private var trackerType: TrackerType = .habit
     private weak var delegate: TrackerFormViewControllerDelegate?
     
+    private var isEdit: Bool = false
     private var trackerId = UUID()
     private var completeCount = 0
     private var sections = TrackerFormViewControllerSections.allCases
@@ -149,7 +150,9 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         at category: TrackerCategory,
         delegate: TrackerFormViewControllerDelegate?
     ) {
-        title = trackerType.editTitle
+        title = tracker.type.editTitle
+        
+        isEdit = true
         
         self.completeCount = completeCount
         self.delegate = delegate
@@ -408,7 +411,10 @@ extension TrackerFormViewController: UICollectionViewDataSource {
                 if let cell = cell as? ColorCollectionViewCell {
                     let color = colors[indexPath.item]
                     
-                    cell.configure(color: color, isSelected: selectedColor?.hexString() == color.hexString())
+                    cell.configure(
+                        color: color,
+                        isSelected: selectedColor?.hexString() == color.hexString()
+                    )
                 }
                 
                 return cell
@@ -524,7 +530,10 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
             case .colors:
                 var previousIndexPath: IndexPath?
                 
-                if let selectedColor, let previousIndex = colors.firstIndex(of: selectedColor) {
+                if let selectedColor,
+                   let previousIndex = colors.firstIndex(where: {
+                       selectedColor.hexString() == $0.hexString()
+                   }) {
                     previousIndexPath = IndexPath(item: previousIndex, section: indexPath.section)
                 }
                 
@@ -555,14 +564,14 @@ extension TrackerFormViewController: TextFieldCollectionViewCellDelegate {
                 formCollectionView.insertItems(at: [
                     IndexPath(
                         item: TrackerFormViewControllerTextField.error.rawValue,
-                        section: TrackerFormViewControllerSections.name.rawValue
+                        section: TrackerFormViewControllerSections.name.rawValue - (isEdit ? 0 : 1)
                     )
                 ])
             } else {
                 formCollectionView.deleteItems(at: [
                     IndexPath(
                         item: TrackerFormViewControllerTextField.error.rawValue,
-                        section: TrackerFormViewControllerSections.name.rawValue
+                        section: TrackerFormViewControllerSections.name.rawValue - (isEdit ? 0 : 1)
                     )
                 ])
             }
@@ -587,7 +596,7 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.categories.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         viewController.dismiss(animated: true) { [weak self] in
@@ -600,7 +609,7 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.categories.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         formCollectionView.reloadItems(at: [indexPath])
@@ -621,7 +630,7 @@ extension TrackerFormViewController: ScheduleViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.schedule.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         viewController.dismiss(animated: true) { [weak self] in

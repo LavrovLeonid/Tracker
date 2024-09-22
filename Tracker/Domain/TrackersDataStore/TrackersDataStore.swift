@@ -13,10 +13,17 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
     private let categoriesDataStore = CategoriesDataStore.shared
     private let calendar = Calendar.current
     
+    private let today = Date()
+    
     let dataStoreUpdates = DataStoreUpdates()
     
     private(set) var searchText = ""
-    private var currentDate = Date()
+    private(set) var appliedFilter: TrackersFilter = .all
+    
+    private lazy var currentDate: Date = {
+        today
+    }()
+    
     private var currentWeekday: WeekDay {
         WeekDay(
             rawValue: calendar.dateComponents(
@@ -69,6 +76,12 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         super.init()
         
         categoriesDataStore.delegate = self
+    }
+    
+    func fetchTrackers() {
+        trackersFetchedResultsController.fetchRequest.predicate = getTrackersPredicate()
+        
+        try? trackersFetchedResultsController.performFetch()
     }
     
     func numberOfItemsInSection(_ section: Int) -> Int {
@@ -176,6 +189,8 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         
         trackerEntity.removeFromRecords(trackerRecordEntity)
         
+        context.delete(trackerRecordEntity)
+        
         contextSave()
     }
     
@@ -185,18 +200,20 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         contextSave()
     }
     
-    func setCurrentDate(_ date: Date) {
+    func setDate(_ date: Date) {
         self.currentDate = date
-        
-        trackersFetchedResultsController.fetchRequest.predicate = getTrackersPredicate()
-        try? trackersFetchedResultsController.performFetch()
+    }
+    
+    func resetDate() {
+        self.currentDate = today
     }
     
     func setSearchText(_ searchText: String) {
         self.searchText = searchText
-        
-        trackersFetchedResultsController.fetchRequest.predicate = getTrackersPredicate()
-        try? trackersFetchedResultsController.performFetch()
+    }
+    
+    func setFilter(_ filter: TrackersFilter) {
+        self.appliedFilter = filter
     }
     
     func isPinnedTracker(at indexPath: IndexPath) -> Bool {
@@ -220,6 +237,15 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         
         contextSave()
     }
+    var startOfDay: Date {
+            return calendar.startOfDay(for: currentDate)
+        }
+    var endOfDay: Date {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        return calendar.date(byAdding: components, to: startOfDay)!
+    }
     
     private func getTrackersPredicate() -> NSCompoundPredicate {
         let typePredicate = NSPredicate(
@@ -233,12 +259,39 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
             NSString(string: String(currentWeekday.rawValue))
         )
         
-        let typeOrDatePredicate = NSCompoundPredicate(
-            orPredicateWithSubpredicates: [typePredicate, weekDayPredicate]
+        let predicates: [NSPredicate] = [typePredicate, weekDayPredicate]
+        
+        var filterPredicate: NSPredicate?
+        
+        switch appliedFilter {
+            case .completed:
+                filterPredicate = NSPredicate(
+                    format: "SUBQUERY(records, $record, $record.date BETWEEN {%@, %@}).@count > 0",
+                    startOfDay as NSDate,
+                    endOfDay as NSDate
+                )
+            case .notCompleted:
+                filterPredicate = NSPredicate(
+                    format: "SUBQUERY(records, $record, $record.date BETWEEN {%@, %@}).@count == 0",
+                    startOfDay as NSDate,
+                    endOfDay as NSDate
+                )
+            default:
+                break
+        }
+        
+        let compoundPredicate = NSCompoundPredicate(
+            orPredicateWithSubpredicates: predicates
         )
         
         guard !searchText.isEmpty else {
-            return typeOrDatePredicate
+            if let filterPredicate {
+                return NSCompoundPredicate(
+                    andPredicateWithSubpredicates: [compoundPredicate, filterPredicate]
+                )
+            } else {
+                return compoundPredicate
+            }
         }
         
         let searchNamePredicate = NSPredicate(
@@ -247,9 +300,15 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
             NSString(string: searchText.lowercased())
         )
         
-        return NSCompoundPredicate(
-            andPredicateWithSubpredicates: [typeOrDatePredicate, searchNamePredicate]
-        )
+        if let filterPredicate {
+            return NSCompoundPredicate(
+                andPredicateWithSubpredicates: [compoundPredicate, filterPredicate, searchNamePredicate]
+            )
+        } else {
+            return NSCompoundPredicate(
+                andPredicateWithSubpredicates: [compoundPredicate, searchNamePredicate]
+            )
+        }
     }
     
     private func createTrackerEntity(_ tracker: Tracker) -> TrackerEntity {
@@ -260,7 +319,9 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         trackerEntity.color = tracker.color.hexString()
         trackerEntity.emoji = tracker.emoji
         trackerEntity.type = Int16(tracker.type.rawValue)
-        trackerEntity.schedules = tracker.schedules.map { String($0.rawValue) }.joined(separator: ",")
+        trackerEntity.schedules = tracker.schedules.map {
+            String($0.rawValue)
+        }.joined(separator: ",")
         
         return trackerEntity
     }

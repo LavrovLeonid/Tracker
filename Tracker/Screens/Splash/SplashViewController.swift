@@ -26,9 +26,10 @@ final class SplashViewController: UIViewController {
             return
         }
         
-        let trackersViewModel = TrackersViewModel(dataStore: TrackersDataStore())
         let trackersViewController = TrackersViewController(
-            viewModel: trackersViewModel
+            viewModel: TrackersViewModel(
+                dataStore: TrackersDataStore()
+            )
         )
         
         trackersViewController.tabBarItem = UITabBarItem(
@@ -37,7 +38,12 @@ final class SplashViewController: UIViewController {
             tag: 0
         )
         
-        let statisticsViewController = StatisticsViewController()
+        let statisticsViewController = StatisticsViewController(
+            viewModel: StatisticsViewModel(
+                statisticsDataStore: StatisticsDataStore(),
+                statisticsModel: StatisticsModel())
+        )
+        
         statisticsViewController.tabBarItem = UITabBarItem(
             title: "Статистика",
             image: .statisticsIcon,

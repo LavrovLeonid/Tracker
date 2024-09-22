@@ -27,5 +27,9 @@ final class PrimaryButton: BaseButton {
         backgroundColor = .trackerBlack
         setTitleColor(.trackerWhite, for: .normal)
         setTitleColor(.trackerWhite, for: .disabled)
+        
+        NSLayoutConstraint.activate([
+            heightAnchor.constraint(equalToConstant: 60)
+        ])
     }
 }
