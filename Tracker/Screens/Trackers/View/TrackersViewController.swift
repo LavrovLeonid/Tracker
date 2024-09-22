@@ -88,6 +88,7 @@ final class TrackersViewController:
     }()
     
     // MARK: Helpers
+    private let analytics = AnalyticsService.shared
     private let geometricParams = GeometricParams(
         cellCount: 2,
         leftInset: 16,
@@ -172,6 +173,18 @@ final class TrackersViewController:
         setupConstraints()
         
         viewModel.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        analytics.report(.open, from: .trackers)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        analytics.report(.close, from: .trackers)
     }
     
     // MARK: PresentingViewController
@@ -347,6 +360,8 @@ final class TrackersViewController:
     
     // MARK: Actions
     @IBAction private func addTrackerCategoryTapped() {
+        analytics.report(.click(.addTrack), from: .trackers)
+        
         presentCreateTrackerCategoryViewController()
     }
     
@@ -359,6 +374,8 @@ final class TrackersViewController:
     }
     
     @IBAction private func filtersButtonTapped() {
+        analytics.report(.click(.filter), from: .trackers)
+        
         presentFiltersViewController()
     }
 }
@@ -439,6 +456,8 @@ extension TrackersViewController: UICollectionViewDelegate {
                 UIAction(title: NSLocalizedString("trackersEdit", comment: "Edit tracker")) { [weak self] _ in
                     guard let self else { return }
                     
+                    analytics.report(.click(.edit), from: .trackers)
+                    
                     presentTrackerFormViewController(at: indexPath)
                 },
                 UIAction(
@@ -449,6 +468,8 @@ extension TrackersViewController: UICollectionViewDelegate {
                     attributes: [.destructive]
                 ) { [weak self] _ in
                     guard let self else { return }
+                    
+                    analytics.report(.click(.delete), from: .trackers)
                     
                     presentAlertToRemoveTracker(at: indexPath)
                 }
@@ -461,7 +482,8 @@ extension TrackersViewController: UICollectionViewDelegate {
         contextMenuConfiguration configuration: UIContextMenuConfiguration,
         highlightPreviewForItemAt indexPath: IndexPath
     ) -> UITargetedPreview? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell 
+        guard 
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell
         else { return nil }
         
         return cell.targetedPreview
@@ -521,6 +543,8 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func trackerCellComplete(cell: TrackerCollectionViewCell) {
         guard let indexPath = trackersCollectionView.indexPath(for: cell) else { return }
+        
+        analytics.report(.click(.track), from: .trackers)
         
         viewModel.completeTrackerTapped(at: indexPath)
     }
