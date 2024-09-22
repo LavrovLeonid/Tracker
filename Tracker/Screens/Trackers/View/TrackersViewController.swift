@@ -38,7 +38,10 @@ final class TrackersViewController:
         
         emptyView.isHidden = true
         emptyView.translatesAutoresizingMaskIntoConstraints = false
-        emptyView.configure(image: .emptyTrackers, text: "Что будем отслеживать?")
+        emptyView.configure(
+            image: .emptyTrackers,
+            text: NSLocalizedString("trackersEmpty", comment: "Empty trackers state")
+        )
         
         return emptyView
     }()
@@ -47,7 +50,10 @@ final class TrackersViewController:
         
         emptyView.isHidden = true
         emptyView.translatesAutoresizingMaskIntoConstraints = false
-        emptyView.configure(image: .notFoundTrackers, text: "Ничего не найдено")
+        emptyView.configure(
+            image: .notFoundTrackers,
+            text: NSLocalizedString("trackersNotFound", comment: "Not found trackers state")
+        )
         
         return emptyView
     }()
@@ -75,7 +81,7 @@ final class TrackersViewController:
     private lazy var filtersButton: FiltersButton = {
         let filtersButton = FiltersButton()
         
-        filtersButton.setTitle("Фильтры", for: .normal)
+        filtersButton.setTitle(NSLocalizedString("trackersFilters", comment: "Trackers filters"), for: .normal)
         filtersButton.addTarget(self, action: #selector(filtersButtonTapped), for: .touchUpInside)
         
         return filtersButton
@@ -170,7 +176,7 @@ final class TrackersViewController:
     
     // MARK: PresentingViewController
     func setupView() {
-        title = "Трекеры"
+        title = NSLocalizedString("trackersTitle", comment: "Trackers title")
         
         let leftBarButtonItem = UIBarButtonItem(
             image: .plusIcon,
@@ -184,9 +190,7 @@ final class TrackersViewController:
         
         let searchController = UISearchController(searchResultsController: nil)
         
-        searchController.searchBar.placeholder = "Поиск"
         searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.setValue("Отменить", forKey: "cancelButtonText")
         searchController.searchBar.searchTextField.addTarget(
             self,
             action: #selector(searchTextFieldEditingChanged(_:)),

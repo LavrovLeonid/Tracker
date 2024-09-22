@@ -56,7 +56,10 @@ final class TrackerQuantityManagmentView: UIView {
     ) {
         self.delegate = delegate
         
-        quantityLabel.text = "\(quantity) д\(quantity.getEnding(one: "ень", notMany: "ня", many: "ней"))"
+        quantityLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "Number of completed days"),
+            quantity
+        )
         
         if isSelected {
             ellipseButton.backgroundColor = buttonBackground.withAlphaComponent(0.3)

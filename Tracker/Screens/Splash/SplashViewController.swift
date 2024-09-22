@@ -33,7 +33,7 @@ final class SplashViewController: UIViewController {
         )
         
         trackersViewController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("trackersTitle", comment: "Trackers title"),
             image: .trackersIcon,
             tag: 0
         )
@@ -45,7 +45,7 @@ final class SplashViewController: UIViewController {
         )
         
         statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("statisticsTitle", comment: "Statistics title"),
             image: .statisticsIcon,
             tag: 1
         )

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        return true
+        true
     }
     
     func application(
@@ -22,8 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
-        
-        return UISceneConfiguration(
+        UISceneConfiguration(
             name: "Default Configuration",
             sessionRole: connectingSceneSession.role
         )

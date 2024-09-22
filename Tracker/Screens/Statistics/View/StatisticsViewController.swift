@@ -83,7 +83,7 @@ final class StatisticsViewController: UIViewController, PresentingViewController
     }
     
     func setupView() {
-        navigationItem.title = "Статистика"
+        title = NSLocalizedString("statisticsTitle", comment: "Statistics title")
         navigationItem.largeTitleDisplayMode = .always
         
         let searchController = UISearchController(searchResultsController: nil)
