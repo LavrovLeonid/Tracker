@@ -29,6 +29,7 @@ final class TrackersViewController:
         collectionView.isHidden = true
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
+        collectionView.contentInset = .init(top: 0, left: 0, bottom: 50, right: 0)
         
         return collectionView
     }()
@@ -484,7 +485,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         minimumLineSpacingForSectionAt section: Int
     ) -> CGFloat {
-        0
+        .zero
     }
 }
 
