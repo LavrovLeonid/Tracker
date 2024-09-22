@@ -23,6 +23,18 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
     private lazy var currentDate: Date = {
         today
     }()
+    private var startOfDay: Date {
+        calendar.startOfDay(for: currentDate)
+    }
+    
+    private var endOfDay: Date {
+        var components = DateComponents()
+        
+        components.day = 1
+        components.second = -1
+        
+        return calendar.date(byAdding: components, to: startOfDay) ?? Date()
+    }
     
     private var currentWeekday: WeekDay {
         WeekDay(
@@ -237,15 +249,6 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
         
         contextSave()
     }
-    var startOfDay: Date {
-            return calendar.startOfDay(for: currentDate)
-        }
-    var endOfDay: Date {
-        var components = DateComponents()
-        components.day = 1
-        components.second = -1
-        return calendar.date(byAdding: components, to: startOfDay)!
-    }
     
     private func getTrackersPredicate() -> NSCompoundPredicate {
         let typePredicate = NSPredicate(
@@ -364,6 +367,7 @@ final class TrackersDataStore: NSObject, TrackersDataStoreProtocol {
             name: trackerEntity.name ?? "",
             color: UIColor(hex: trackerEntity.color ?? "") ?? .trackerBlue,
             emoji: trackerEntity.emoji ?? "",
+            isPinned: trackerEntity.sectionCategory?.isPinned ?? false,
             schedules: Set(schedules)
         )
     }

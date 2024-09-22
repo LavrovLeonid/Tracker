@@ -11,6 +11,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     private var trackerType: TrackerType = .habit
     private weak var delegate: TrackerFormViewControllerDelegate?
     
+    private var isPinned: Bool = false
     private var isEdit: Bool = false
     private var trackerId = UUID()
     private var completeCount = 0
@@ -157,6 +158,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
         self.completeCount = completeCount
         self.delegate = delegate
         
+        isPinned = tracker.isPinned
         trackerId = tracker.id
         trackerType = tracker.type
         trackerName = tracker.name
@@ -266,6 +268,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
                 name: trackerName,
                 color: selectedColor,
                 emoji: selectedEmoji,
+                isPinned: isPinned,
                 schedules: selectedWeekDays
             )
         )
