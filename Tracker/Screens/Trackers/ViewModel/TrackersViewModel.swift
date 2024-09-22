@@ -148,7 +148,12 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         
         if trackersDataStore.isEmptyTrackerCategories {
             if trackersDataStore.searchText.isEmpty {
-                onTrackersPresentEmptyView?()
+                switch trackersDataStore.appliedFilter {
+                    case .completed, .notCompleted:
+                        onTrackersPresentNotFoundView?()
+                    default:
+                        onTrackersPresentEmptyView?()
+                }
             } else {
                 onTrackersPresentNotFoundView?()
             }

@@ -263,7 +263,7 @@ final class TrackersViewController:
         trackersCollectionView.isHidden = true
         emptyView.isHidden = true
         notFoundView.isHidden = false
-        filtersButton.isHidden = true
+        filtersButton.isHidden = false
     }
     
     // MARK: Routing
