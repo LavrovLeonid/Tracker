@@ -178,6 +178,12 @@ final class TrackersViewController:
     func setupView() {
         title = NSLocalizedString("trackersTitle", comment: "Trackers title")
         
+        tabBarItem = UITabBarItem(
+            title: NSLocalizedString("trackersTitle", comment: "Trackers title"),
+            image: .trackersIcon,
+            tag: 0
+        )
+        
         let leftBarButtonItem = UIBarButtonItem(
             image: .plusIcon,
             style: .plain,
