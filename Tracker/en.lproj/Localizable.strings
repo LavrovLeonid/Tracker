@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Леонид Лавров on 9/22/24.
+ 
+*/
+  
+"statisticsTitle" = "Statistics";
+"trackersEmpty" = "What will we track?";
+"trackersFilters" = "Filters";
+"trackersNotFound" = "Nothing found";
+"trackersTitle" = "Trackers";
+"trackersPin" = "Pin";
+"trackersUnpin" = "Unpin";
+"trackersEdit" = "Edit";
+"trackersDelete" = "Delete";
+"trackersCancel" = "Cancel";
+"trackersConfirmDelete" = "Are you sure you want to delete the tracker?";
+"categoriesPinCategory" = "Pinned";

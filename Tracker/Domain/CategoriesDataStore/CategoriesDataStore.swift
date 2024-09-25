@@ -9,11 +9,33 @@ import CoreData
 import UIKit
 
 final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
-    private var context: NSManagedObjectContext
+    // MARK: Singleton
+    static let shared: CategoriesDataStoreProtocol = CategoriesDataStore()
+    private override init() {
+        super.init()
+    }
     
-    private var insertedIndexes = IndexSet()
-    private var deletedIndexes = IndexSet()
-    private var updatedIndexes = IndexSet()
+    @Multicast var delegate: CategoriesDataStoreDelegate
+    
+    private var context = PersistentContainer.shared.context
+    private let pinCategoryName = NSLocalizedString("categoriesPinCategory", comment: "Pin category")
+    private let dataStoreUpdates = DataStoreUpdates()
+    
+    private(set) lazy var pinCategory: TrackerCategoryEntity = {
+        if let trackerCategoryEntity = fetchTrackerCategoryEntityBy(name: pinCategoryName) {
+            return trackerCategoryEntity
+        }
+        
+        let trackerCategoryEntity = TrackerCategoryEntity(context: context)
+        
+        trackerCategoryEntity.id = UUID()
+        trackerCategoryEntity.name = pinCategoryName
+        trackerCategoryEntity.isPinned = true
+        
+        contextSave()
+        
+        return trackerCategoryEntity
+    }()
     
     private lazy var categoriesFetchedResultsController = {
         let fetchRequest = TrackerCategoryEntity.fetchRequest()
@@ -22,6 +44,12 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
             NSSortDescriptor(keyPath: \TrackerCategoryEntity.name, ascending: true)
         ]
         
+        fetchRequest.predicate = NSPredicate(
+            format: "%K != %@",
+            #keyPath(TrackerCategoryEntity.name),
+            pinCategoryName as CVarArg
+        )
+        
         let controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
@@ -29,44 +57,23 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
             cacheName: nil
         )
         
+        controller.delegate = self
+        
         try? controller.performFetch()
         
         return controller
     }()
     
-    weak var delegate: CategoriesDataStoreDelegate?
-    
-    var isEmptyCategories: Bool {
-        categoriesFetchedResultsController.sections?.isEmpty ?? true
-    }
-    
     var categoriesCount: Int {
         categoriesFetchedResultsController.sections?.first?.numberOfObjects ?? 0
     }
     
-    convenience init(delegate: CategoriesDataStoreDelegate? = nil) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            self.init(delegate: delegate)
-            
-            return
-        }
-        
-        self.init(context: appDelegate.persistentContainer.viewContext, delegate: delegate)
+    var isEmptyCategories: Bool {
+        categoriesCount == 0
     }
     
-    init(context: NSManagedObjectContext, delegate: CategoriesDataStoreDelegate?) {
-        self.context = context
-        self.delegate = delegate
-        
-        super.init()
-        
-        categoriesFetchedResultsController.delegate = self
-    }
-    
-    func category(at index: Int) -> TrackerCategory {
-        format(categoriesFetchedResultsController.object(
-            at: IndexPath(item: index, section: 0)
-        ))
+    func category(at indexPath: IndexPath) -> TrackerCategory {
+        format(categoriesFetchedResultsController.object(at: indexPath))
     }
     
     func addCategory(_ category: TrackerCategory) {
@@ -78,50 +85,63 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
         contextSave()
     }
     
-    func removeCategory(_ category: TrackerCategory) {
-        guard
-            let categoryEntity = fetchTrackerCategoryEntity(at: category)
-        else { return }
-        
-        context.delete(categoryEntity)
-        
-        contextSave()
-    }
-    
     func editCategory(_ category: TrackerCategory) {
-        guard
-            let categoryEntity = fetchTrackerCategoryEntity(at: category)
-        else { return }
+        guard let categoryEntity = fetchTrackerCategoryEntityBy(id: category.id) else { return }
         
         categoryEntity.name = category.name
+        
+        contextSave()
+        
+        $delegate.invoke { delegate in
+            delegate.editCategory(category)
+        }
+    }
+    
+    func removeCategory(at indexPath: IndexPath) {
+        let trackerCategoryEntity = categoriesFetchedResultsController.object(at: indexPath)
+        
+        context.delete(trackerCategoryEntity)
         
         contextSave()
     }
     
     func hasCategory(with name: String) -> Bool {
+        guard pinCategory.name != name else { return true }
+        
+        return categoriesFetchedResultsController.fetchedObjects?.contains {
+            $0.name == name
+        } ?? false
+    }
+    
+    func fetchTrackerCategoryEntityBy(name: String) -> TrackerCategoryEntity? {
         let fetchRequest = TrackerCategoryEntity.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(
-            format: "SOME name == %@",
+            format: "%K == %@",
+            #keyPath(TrackerCategoryEntity.name),
             name as CVarArg
         )
         
-        guard let categories = try? context.fetch(fetchRequest) else { return false }
-        
-        return !categories.isEmpty
+        return try? context.fetch(fetchRequest).first
     }
     
-    private func fetchTrackerCategoryEntity(
-        at trackerCategory: TrackerCategory
-    ) -> TrackerCategoryEntity? {
+    func fetchTrackerCategoryEntityBy(id: TrackerCategoryId) -> TrackerCategoryEntity? {
         let fetchRequest = TrackerCategoryEntity.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(
             format: "id == %@",
-            trackerCategory.id as CVarArg
+            id as CVarArg
         )
         
         return try? context.fetch(fetchRequest).first
+    }
+    
+    func format(_ trackerCategoryEntity: TrackerCategoryEntity) -> TrackerCategory {
+        TrackerCategory(
+            id: trackerCategoryEntity.id ?? UUID(),
+            name: trackerCategoryEntity.name ?? "",
+            trackers: []
+        )
     }
     
     private func contextSave() {
@@ -131,31 +151,17 @@ final class CategoriesDataStore: NSObject, CategoriesDataStoreProtocol {
             print("Ошибка сохранения данных: ", error.localizedDescription)
         }
     }
-    
-    private func format(_ trackerCategoryEntity: TrackerCategoryEntity) -> TrackerCategory {
-        TrackerCategory(
-            id: trackerCategoryEntity.id ?? UUID(),
-            name: trackerCategoryEntity.name ?? "",
-            trackers: []
-        )
-    }
 }
 
 extension CategoriesDataStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(
         _ controller: NSFetchedResultsController<NSFetchRequestResult>
     ) {
-        delegate?.didUpdate(
-            with: DataStoreUpdates(
-                insertedIndexes: insertedIndexes,
-                updatedIndexes: updatedIndexes,
-                deletedIndexes: deletedIndexes
-            )
-        )
+        $delegate.invoke { delegate in
+            delegate.didUpdate(with: dataStoreUpdates)
+        }
         
-        insertedIndexes.removeAll()
-        updatedIndexes.removeAll()
-        deletedIndexes.removeAll()
+        dataStoreUpdates.reset()
     }
     
     func controller(
@@ -165,21 +171,6 @@ extension CategoriesDataStore: NSFetchedResultsControllerDelegate {
         for type: NSFetchedResultsChangeType,
         newIndexPath: IndexPath?
     ) {
-        switch type {
-            case .insert:
-                if let newIndexPath {
-                    insertedIndexes.insert(newIndexPath.item)
-                }
-            case .delete:
-                if let indexPath {
-                    deletedIndexes.insert(indexPath.item)
-                }
-            case .update:
-                if let indexPath {
-                    updatedIndexes.insert(indexPath.item)
-                }
-            default:
-                break
-        }
+        dataStoreUpdates.changeItems(for: type, at: indexPath, newIndexPath: newIndexPath)
     }
 }

@@ -9,9 +9,11 @@ import Foundation
 
 protocol CategoriesViewModelProtocol {
     // MARK: Bindings
-    var onTrackerCategoriesEmptyStateChange: Binding<Bool>? { get set }
-    var onTrackerCategoriesStateChange: Binding<DataStoreUpdates>? { get set }
-    var onSelectedTrackerCategoryStateChange: Binding<TrackerCategory?>? { get set }
+    var onCategoriesStateChange: Binding<DataStoreUpdatesPropertiesProtocol>? { get set }
+    var onCategoriesPresentEmptyView: BindingWithoutValue? { get set }
+    var onCategoriesPresentCollectionView: BindingWithoutValue? { get set }
+    var onCategoriesReloadCollectionView: BindingWithoutValue? { get set }
+    var onSelectedCategoryStateChange: Binding<TrackerCategory?>? { get set }
     
     // MARK: Properties
     var categoriesCount: Int { get }
@@ -22,4 +24,5 @@ protocol CategoriesViewModelProtocol {
     func isSelectedCategory(at indexPath: IndexPath) -> Bool
     func selectCategory(at indexPath: IndexPath)
     func deleteCategory(at indexPath: IndexPath)
+    func didFinishUpdates()
 }

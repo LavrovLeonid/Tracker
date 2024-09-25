@@ -13,7 +13,15 @@ final class TrackerCardView: UIView {
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.alignment = .leading
+        stackView.distribution = .equalSpacing
+        
+        return stackView
+    }()
+    private let headerStackView: UIStackView = {
+        let stackView = UIStackView()
+        
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
         
         return stackView
@@ -46,6 +54,15 @@ final class TrackerCardView: UIView {
         
         return label
     }()
+    private let pinImageView: UIImageView = {
+        let imageView = UIImageView()
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = .pinIcon
+        
+        return imageView
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,6 +78,14 @@ final class TrackerCardView: UIView {
         backgroundColor = tracker.color
         nameLabel.text = tracker.name
         emojiLabel.text = tracker.emoji
+        
+        if tracker.isPinned {
+            stackView.alignment = .fill
+            pinImageView.isHidden = false
+        } else {
+            stackView.alignment = .leading
+            pinImageView.isHidden = true
+        }
     }
     
     private func setupView() {
@@ -71,7 +96,10 @@ final class TrackerCardView: UIView {
         
         emojiView.addSubview(emojiLabel)
         
-        stackView.addArrangedSubview(emojiView)
+        headerStackView.addArrangedSubview(emojiView)
+        headerStackView.addArrangedSubview(pinImageView)
+        
+        stackView.addArrangedSubview(headerStackView)
         stackView.addArrangedSubview(nameLabel)
         
         addSubview(stackView)
@@ -84,6 +112,9 @@ final class TrackerCardView: UIView {
             
             emojiView.widthAnchor.constraint(equalToConstant: 24),
             emojiView.heightAnchor.constraint(equalToConstant: 24),
+            
+            pinImageView.widthAnchor.constraint(equalToConstant: 24),
+            pinImageView.heightAnchor.constraint(equalToConstant: 24),
             
             emojiLabel.centerXAnchor.constraint(equalTo: emojiView.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: emojiView.centerYAnchor)

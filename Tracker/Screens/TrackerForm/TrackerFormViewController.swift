@@ -11,6 +11,10 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     private var trackerType: TrackerType = .habit
     private weak var delegate: TrackerFormViewControllerDelegate?
     
+    private var isPinned: Bool = false
+    private var isEdit: Bool = false
+    private var trackerId = UUID()
+    private var completeCount = 0
     private var sections = TrackerFormViewControllerSections.allCases
     private let maxTrackerNameLength = 38
     private var showTrackerNameError = false
@@ -63,6 +67,10 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
             DefaultHeaderReusableView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: DefaultHeaderReusableView.reuseIdentifier
+        )
+        collectionView.register(
+            CompleteCountCell.self,
+            forCellWithReuseIdentifier: CompleteCountCell.reuseIdentifier
         )
         collectionView.register(
             TextFieldCollectionViewCell.self,
@@ -129,20 +137,42 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     }
     
     func configure(trackerType: TrackerType, delegate: TrackerFormViewControllerDelegate?) {
+        title = trackerType.createTitle
+        
         self.trackerType = trackerType
         self.delegate = delegate
+        
+        sections.removeFirst()
     }
     
     func configure(
         with tracker: Tracker,
+        completeCount: Int,
         at category: TrackerCategory,
         delegate: TrackerFormViewControllerDelegate?
     ) {
-        // TODO: Натсроить экран редактирования трекера
+        title = tracker.type.editTitle
+        
+        isEdit = true
+        
+        self.completeCount = completeCount
+        self.delegate = delegate
+        
+        isPinned = tracker.isPinned
+        trackerId = tracker.id
+        trackerType = tracker.type
+        trackerName = tracker.name
+        selectedCategory = category
+        selectedWeekDays = tracker.schedules
+        selectedEmoji = tracker.emoji
+        selectedColor = tracker.color
+        
+        submitButton.setTitle("Сохранить", for: .normal)
+        
+        validateForm()
     }
     
     func setupView() {
-        title = trackerType.title
         navigationItem.hidesBackButton = true
         isModalInPresentation = true
         
@@ -176,7 +206,7 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
     
     private func presentCategoriesViewController() {
         let categoriesViewModel = CategoriesViewModel(
-            categoriesDataStore: CategoriesDataStore(),
+            categoriesDataStore: CategoriesDataStore.shared,
             categoriesModel: CategoriesModel(
                 initialSelectedCategory: selectedCategory
             )
@@ -233,11 +263,12 @@ final class TrackerFormViewController: UIViewController, PresentingViewControlle
             self,
             trackerCategory: selectedCategory,
             tracker: .init(
-                id: UUID(),
+                id: trackerId,
                 type: trackerType,
                 name: trackerName,
                 color: selectedColor,
                 emoji: selectedEmoji,
+                isPinned: isPinned,
                 schedules: selectedWeekDays
             )
         )
@@ -251,6 +282,8 @@ extension TrackerFormViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch sections[section] {
+            case .completeCount:
+                1
             case .name:
                 textFieldItemsCount
             case .list:
@@ -291,6 +324,17 @@ extension TrackerFormViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch sections[indexPath.section] {
+            case .completeCount:
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: CompleteCountCell.reuseIdentifier,
+                    for: indexPath
+                )
+                
+                if let cell = cell as? CompleteCountCell {
+                    cell.configure(completeCount: completeCount)
+                }
+                
+                return cell
             case .name:
                 switch textField[indexPath.item] {
                     case .textField:
@@ -370,7 +414,10 @@ extension TrackerFormViewController: UICollectionViewDataSource {
                 if let cell = cell as? ColorCollectionViewCell {
                     let color = colors[indexPath.item]
                     
-                    cell.configure(color: color, isSelected: selectedColor == color)
+                    cell.configure(
+                        color: color,
+                        isSelected: selectedColor?.hexString() == color.hexString()
+                    )
                 }
                 
                 return cell
@@ -398,6 +445,8 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
         insetForSectionAt section: Int
     ) -> UIEdgeInsets {
         switch sections[section] {
+            case .completeCount:
+                UIEdgeInsets(top: 24, left: 16, bottom: 28, right: 16)
             case .name:
                 UIEdgeInsets(top: 24, left: 16, bottom: 12, right: 16)
             case .list:
@@ -428,6 +477,8 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         switch sections[indexPath.section] {
+            case .completeCount:
+                CGSize(width: collectionView.frame.width - 32, height: 38)
             case .name:
                 switch textField[indexPath.item] {
                     case .textField:
@@ -482,7 +533,10 @@ extension TrackerFormViewController: UICollectionViewDelegateFlowLayout {
             case .colors:
                 var previousIndexPath: IndexPath?
                 
-                if let selectedColor, let previousIndex = colors.firstIndex(of: selectedColor) {
+                if let selectedColor,
+                   let previousIndex = colors.firstIndex(where: {
+                       selectedColor.hexString() == $0.hexString()
+                   }) {
                     previousIndexPath = IndexPath(item: previousIndex, section: indexPath.section)
                 }
                 
@@ -513,14 +567,14 @@ extension TrackerFormViewController: TextFieldCollectionViewCellDelegate {
                 formCollectionView.insertItems(at: [
                     IndexPath(
                         item: TrackerFormViewControllerTextField.error.rawValue,
-                        section: TrackerFormViewControllerSections.name.rawValue
+                        section: TrackerFormViewControllerSections.name.rawValue - (isEdit ? 0 : 1)
                     )
                 ])
             } else {
                 formCollectionView.deleteItems(at: [
                     IndexPath(
                         item: TrackerFormViewControllerTextField.error.rawValue,
-                        section: TrackerFormViewControllerSections.name.rawValue
+                        section: TrackerFormViewControllerSections.name.rawValue - (isEdit ? 0 : 1)
                     )
                 ])
             }
@@ -545,7 +599,7 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.categories.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         viewController.dismiss(animated: true) { [weak self] in
@@ -558,7 +612,7 @@ extension TrackerFormViewController: CategoriesViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.categories.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         formCollectionView.reloadItems(at: [indexPath])
@@ -579,7 +633,7 @@ extension TrackerFormViewController: ScheduleViewControllerDelegate {
         
         let indexPath = IndexPath(
             item: TrackerFormViewControllerListItems.schedule.rawValue,
-            section: TrackerFormViewControllerSections.list.rawValue
+            section: TrackerFormViewControllerSections.list.rawValue - (isEdit ? 0 : 1)
         )
         
         viewController.dismiss(animated: true) { [weak self] in

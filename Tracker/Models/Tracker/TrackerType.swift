@@ -20,12 +20,21 @@ enum TrackerType: Int {
         }
     }
     
-    var title: String {
+    var createTitle: String {
         switch self {
             case .habit:
                 "Новая привычка"
             case .event:
                 "Новое нерегулярное событие"
+        }
+    }
+    
+    var editTitle: String {
+        switch self {
+            case .habit:
+                "Редактирование привычки"
+            case .event:
+                "Редактирование события"
         }
     }
 }

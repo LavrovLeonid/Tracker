@@ -8,5 +8,16 @@
 import Foundation
 
 protocol CategoriesDataStoreDelegate: AnyObject {
-    func didUpdate(with updates: DataStoreUpdates)
+    func didUpdate(with updates: DataStoreUpdatesPropertiesProtocol)
+    func editCategory(_ category: TrackerCategory)
+}
+
+extension CategoriesDataStoreDelegate {
+    func didUpdate(with updates: DataStoreUpdatesPropertiesProtocol) {
+        
+    }
+    
+    func editCategory(_ category: TrackerCategory) {
+        
+    }
 }

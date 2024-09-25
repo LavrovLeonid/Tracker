@@ -22,6 +22,10 @@ final class OutlineButton: BaseButton {
     func configure(color: UIColor) {
         setTitleColor(color, for: .normal)
         layer.borderColor = color.cgColor
+        
+        NSLayoutConstraint.activate([
+            heightAnchor.constraint(equalToConstant: 60)
+        ])
     }
     
     private func setupButton() {

@@ -8,6 +8,7 @@
 import Foundation
 
 enum TrackerFormViewControllerSections: Int, CaseIterable {
+    case completeCount
     case name
     case list
     case emoji
